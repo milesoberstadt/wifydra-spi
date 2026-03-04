@@ -41,9 +41,41 @@ uint16_t calculate_checksum(const uint8_t *data, size_t len) {
     return (uint16_t)(sum & 0xFFFF);
 }
 
+typedef struct __attribute__((packed)) {
+    float latitude;
+    float longitude;
+} gps_coords_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t command;
+    uint8_t wifi_channel;
+    gps_coords_t gps;
+    uint8_t padding[PAYLOAD_SIZE - sizeof(uint8_t) - sizeof(uint8_t) - sizeof(gps_coords_t)];
+} controller_msg_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t status;
+    uint8_t reserved;
+    uint16_t checksum;
+    uint8_t data[PAYLOAD_SIZE - 4];
+} worker_msg_t;
+
+// Wifi Configuration Logic
+static const uint8_t popular_channels[] = {1, 6, 11, 2, 7, 12, 3, 8, 13, 4, 9, 5, 10, 14};
+// Map: CS Index -> Current Channel
+static uint8_t worker_current_channels[3]; 
+
+static const gps_coords_t static_gps = {
+    .latitude = 37.7749f,  // San Francisco
+    .longitude = -122.4194f
+};
+
 void app_main(void) {
     ESP_LOGI(TAG, "Starting up... Waiting 1 second for workers.");
     vTaskDelay(pdMS_TO_TICKS(1000));
+
+    // Initialize channels from popularity list
+    for(int i=0; i<3; i++) worker_current_channels[i] = popular_channels[i];
 
     // 1. SPI Bus Configuration
     spi_bus_config_t buscfg = {
@@ -71,10 +103,12 @@ void app_main(void) {
         ESP_ERROR_CHECK(spi_bus_add_device(HSPI_HOST, &devcfg, &workers[i]));
     }
 
-    uint8_t *recvbuf = heap_caps_calloc(1, PAYLOAD_SIZE, MALLOC_CAP_DMA);
-    uint8_t *txbuf = heap_caps_calloc(1, PAYLOAD_SIZE, MALLOC_CAP_DMA);
-    if (recvbuf == NULL || txbuf == NULL) {
-        ESP_LOGE(TAG, "Failed to allocate SPI buffers!");
+    // Allocate structured buffers
+    controller_msg_t *tx_frame = heap_caps_calloc(1, sizeof(controller_msg_t), MALLOC_CAP_DMA);
+    worker_msg_t *rx_frame = heap_caps_calloc(1, sizeof(worker_msg_t), MALLOC_CAP_DMA);
+
+    if (tx_frame == NULL || rx_frame == NULL) {
+        ESP_LOGE(TAG, "Failed to allocate SPI structured buffers!");
         return;
     }
     
@@ -82,34 +116,30 @@ void app_main(void) {
         for (int i = 0; i < 3; i++) {
             ESP_LOGI(TAG, "--- Checking Worker %d (CS Pin %d) ---", i + 1, cs_pins[i]);
 
-            // Single transaction: Send CMD + Zeros, Receive ACK + Payload
-            memset(recvbuf, 0, PAYLOAD_SIZE);
-            memset(txbuf, 0, PAYLOAD_SIZE);
-            txbuf[0] = HANDSHAKE_CMD;
+            // Prepare Frame
+            memset(tx_frame, 0, sizeof(controller_msg_t));
+            tx_frame->command = HANDSHAKE_CMD;
+            tx_frame->wifi_channel = worker_current_channels[i];
+            tx_frame->gps = static_gps;
 
             spi_transaction_t t = {
                 .length = PAYLOAD_SIZE * 8,
-                .tx_buffer = txbuf,
-                .rx_buffer = recvbuf,
+                .tx_buffer = tx_frame,
+                .rx_buffer = rx_frame,
             };
 
             esp_err_t ret = spi_device_transmit(workers[i], &t);
             if (ret == ESP_OK) {
-                // The worker's first byte should be the ACK
-                if (recvbuf[0] == HANDSHAKE_ACK) {
-                    uint16_t received_checksum;
-                    // Checksum was at offset 2 in sendbuf
-                    memcpy(&received_checksum, recvbuf + 2, sizeof(uint16_t));
-                    uint16_t calculated = calculate_checksum(recvbuf + 4, PAYLOAD_SIZE - 4);
+                if (rx_frame->status == HANDSHAKE_ACK) {
+                    uint16_t calculated = calculate_checksum(rx_frame->data, sizeof(rx_frame->data));
 
-                    if (received_checksum == calculated) {
-                        ESP_LOGI(TAG, "Success! Worker %d Checksum OK.", i + 1);
+                    if (rx_frame->checksum == calculated) {
+                        ESP_LOGI(TAG, "Success! Worker %d (CH %d) Checksum OK.", i + 1, tx_frame->wifi_channel);
                     } else {
-                        ESP_LOGE(TAG, "Checksum mismatch! Worker %d Recv: 0x%04X, Calc: 0x%04X", i + 1, received_checksum, calculated);
-                        ESP_LOG_BUFFER_HEX_LEVEL(TAG, recvbuf, 16, ESP_LOG_INFO);
+                        ESP_LOGE(TAG, "Checksum mismatch! Worker %d Recv: 0x%04X, Calc: 0x%04X", i + 1, rx_frame->checksum, calculated);
                     }
                 } else {
-                    ESP_LOGW(TAG, "Worker %d failed handshake (Rx: 0x%02X)", i + 1, recvbuf[0]);
+                    ESP_LOGW(TAG, "Worker %d failed handshake (Rx Status: 0x%02X)", i + 1, rx_frame->status);
                 }
             } else {
                 ESP_LOGE(TAG, "Transmission failed for Worker %d: %s", i + 1, esp_err_to_name(ret));
