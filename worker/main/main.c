@@ -19,9 +19,9 @@ static const char *TAG = "WORKER";
 #define GPIO_CS   2
 
 #define PAYLOAD_SIZE 5100
-#define HANDSHAKE_CMD 0xAB
 #define HANDSHAKE_ACK 0xBA
 
+// Protocol Structs
 typedef struct __attribute__((packed)) {
     float latitude;
     float longitude;
@@ -57,7 +57,7 @@ typedef struct __attribute__((packed)) {
 #define MAX_MACS 50
 static wigle_record_t *mac_table = NULL;
 static int mac_count = 0;
-static uint8_t current_wifi_ch = 1;
+static uint8_t current_wifi_ch = 0; // 0 = Not assigned/Not scanning
 static uint32_t current_unix_time = 0;
 static gps_coords_t current_gps = {0};
 static SemaphoreHandle_t mac_mutex = NULL;
@@ -86,7 +86,7 @@ void parse_beacon_ie(const uint8_t *payload, size_t len, char *ssid, char *cap) 
 }
 
 void wifi_sniffer_packet_handler(void* buf, wifi_promiscuous_pkt_type_t type) {
-    if (type != WIFI_PKT_MGMT || mac_table == NULL || mac_mutex == NULL) return;
+    if (type != WIFI_PKT_MGMT || current_wifi_ch == 0 || mac_table == NULL || mac_mutex == NULL) return;
     
     wifi_promiscuous_pkt_t *pkt = (wifi_promiscuous_pkt_t *)buf;
     if (pkt->rx_ctrl.sig_len < 36 || pkt->payload[0] != 0x80) return;
@@ -113,52 +113,39 @@ void wifi_sniffer_packet_handler(void* buf, wifi_promiscuous_pkt_type_t type) {
             r->lon = current_gps.longitude;
             parse_beacon_ie(pkt->payload, pkt->rx_ctrl.sig_len, r->ssid, r->capabilities);
             mac_count++;
-            ESP_LOGI(TAG, "New AP discovered: %s [%02X:%02X:%02X:%02X:%02X:%02X]", 
-                     r->ssid, r->bssid[0], r->bssid[1], r->bssid[2], 
-                     r->bssid[3], r->bssid[4], r->bssid[5]);
+            ESP_LOGI(TAG, "Ch %d | New AP: %s", current_wifi_ch, r->ssid);
         }
         xSemaphoreGive(mac_mutex);
     }
 }
 
-void app_main(void) {
-    // 1. Fundamental system init (Wait for stability)
-    vTaskDelay(pdMS_TO_TICKS(2000));
-    ESP_LOGI(TAG, "Initializing memory...");
+void wifi_init_sniffer(void) {
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_NULL));
+    ESP_ERROR_CHECK(esp_wifi_start());
+    // Promiscuous remains OFF until channel is assigned
+    ESP_ERROR_CHECK(esp_wifi_set_promiscuous_rx_cb(&wifi_sniffer_packet_handler));
+}
 
-    // 2. Allocate resources FIRST before starting any tasks/interrupts
+void app_main(void) {
+    vTaskDelay(pdMS_TO_TICKS(2000));
+    ESP_LOGI(TAG, "Worker ready. Waiting for SPI channel assignment...");
+    
     mac_mutex = xSemaphoreCreateMutex();
     mac_table = heap_caps_calloc(MAX_MACS, sizeof(wigle_record_t), MALLOC_CAP_INTERNAL);
-    
-    worker_msg_t *tx = heap_caps_calloc(1, sizeof(worker_msg_t), MALLOC_CAP_DMA);
-    controller_msg_t *rx = heap_caps_calloc(1, sizeof(controller_msg_t), MALLOC_CAP_DMA);
 
-    if (!mac_mutex || !mac_table || !tx || !rx) {
-        ESP_LOGE(TAG, "Fatal: Memory allocation failed");
-        esp_restart();
-    }
+    wifi_init_sniffer();
 
-    // 3. Initialize NVS
-    esp_err_t nvs_ret = nvs_flash_init();
-    if (nvs_ret == ESP_ERR_NVS_NO_FREE_PAGES || nvs_ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        nvs_flash_erase();
-        nvs_flash_init();
-    }
-    
-    // 4. Start WiFi
-    ESP_LOGI(TAG, "Starting WiFi...");
-    esp_netif_init();
-    esp_event_loop_create_default();
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    esp_wifi_init(&cfg);
-    esp_wifi_set_storage(WIFI_STORAGE_RAM);
-    esp_wifi_set_mode(WIFI_MODE_NULL);
-    esp_wifi_start();
-    esp_wifi_set_promiscuous(true);
-    esp_wifi_set_promiscuous_rx_cb(&wifi_sniffer_packet_handler);
-
-    // 5. Start SPI
-    ESP_LOGI(TAG, "Starting SPI...");
     spi_bus_config_t buscfg = {
         .miso_io_num = GPIO_MISO, .mosi_io_num = GPIO_MOSI, .sclk_io_num = GPIO_SCLK,
         .max_transfer_sz = PAYLOAD_SIZE + 100
@@ -168,7 +155,8 @@ void app_main(void) {
     };
     spi_slave_initialize(SPI2_HOST, &buscfg, &slvcfg, SPI_DMA_CH_AUTO);
 
-    ESP_LOGI(TAG, "Worker fully operational.");
+    worker_msg_t *tx = heap_caps_calloc(1, sizeof(worker_msg_t), MALLOC_CAP_DMA);
+    controller_msg_t *rx = heap_caps_calloc(1, sizeof(controller_msg_t), MALLOC_CAP_DMA);
 
     while (1) {
         tx->status = HANDSHAKE_ACK;
@@ -186,13 +174,23 @@ void app_main(void) {
         };
         
         if (spi_slave_transmit(SPI2_HOST, &t, portMAX_DELAY) == ESP_OK) {
-            if (rx->command == HANDSHAKE_CMD) {
+            // Check for valid channel in every SPI frame
+            if (rx->wifi_channel >= 1 && rx->wifi_channel <= 14) {
                 current_unix_time = rx->unix_time;
                 current_gps = rx->gps;
-                if (rx->wifi_channel >= 1 && rx->wifi_channel <= 14 && rx->wifi_channel != current_wifi_ch) {
+
+                if (rx->wifi_channel != current_wifi_ch) {
+                    ESP_LOGI(TAG, "Assigning Channel: %d (Old: %d). Clearing table.", rx->wifi_channel, current_wifi_ch);
+                    
+                    xSemaphoreTake(mac_mutex, portMAX_DELAY);
+                    mac_count = 0;
+                    memset(mac_table, 0, MAX_MACS * sizeof(wigle_record_t));
                     current_wifi_ch = rx->wifi_channel;
-                    ESP_LOGI(TAG, "Switching to WiFi channel %d", current_wifi_ch);
+                    
+                    esp_wifi_set_promiscuous(false); // Stop while changing
                     esp_wifi_set_channel(current_wifi_ch, WIFI_SECOND_CHAN_NONE);
+                    esp_wifi_set_promiscuous(true);  // Start/Restart scanning
+                    xSemaphoreGive(mac_mutex);
                 }
             }
         }
