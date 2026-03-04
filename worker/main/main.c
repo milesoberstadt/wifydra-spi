@@ -21,7 +21,6 @@ static const char *TAG = "WORKER";
 #define PAYLOAD_SIZE 5100
 #define HANDSHAKE_ACK 0xBA
 
-// Protocol Structs
 typedef struct __attribute__((packed)) {
     float latitude;
     float longitude;
@@ -37,7 +36,7 @@ typedef struct __attribute__((packed)) {
 
 typedef struct __attribute__((packed)) {
     uint8_t status;
-    uint8_t reserved;
+    uint8_t reserved; // Number of records in this packet
     uint16_t checksum;
     uint8_t data[5100 - 4];
 } worker_msg_t;
@@ -52,15 +51,22 @@ typedef struct __attribute__((packed)) {
     float lat;
     float lon;
     uint32_t hits;
+    uint8_t sent; // 0 = unsent, 1 = sent
 } wigle_record_t;
 
-#define MAX_MACS 50
+#define MAX_MACS 500
+#define RECORDS_PER_BUFFER 50 // How many fit in 5096 bytes (98 bytes each)
+
 static wigle_record_t *mac_table = NULL;
 static int mac_count = 0;
-static uint8_t current_wifi_ch = 0; // 0 = Not assigned/Not scanning
+static uint8_t current_wifi_ch = 0;
 static uint32_t current_unix_time = 0;
 static gps_coords_t current_gps = {0};
 static SemaphoreHandle_t mac_mutex = NULL;
+
+// Indices of records currently being sent
+static int in_flight_indices[RECORDS_PER_BUFFER];
+static int in_flight_count = 0;
 
 uint16_t calculate_checksum(const uint8_t *data, size_t len) {
     uint32_t sum = 0;
@@ -87,7 +93,6 @@ void parse_beacon_ie(const uint8_t *payload, size_t len, char *ssid, char *cap) 
 
 void wifi_sniffer_packet_handler(void* buf, wifi_promiscuous_pkt_type_t type) {
     if (type != WIFI_PKT_MGMT || current_wifi_ch == 0 || mac_table == NULL || mac_mutex == NULL) return;
-    
     wifi_promiscuous_pkt_t *pkt = (wifi_promiscuous_pkt_t *)buf;
     if (pkt->rx_ctrl.sig_len < 36 || pkt->payload[0] != 0x80) return;
 
@@ -111,6 +116,7 @@ void wifi_sniffer_packet_handler(void* buf, wifi_promiscuous_pkt_type_t type) {
             r->rssi = pkt->rx_ctrl.rssi;
             r->lat = current_gps.latitude;
             r->lon = current_gps.longitude;
+            r->sent = 0;
             parse_beacon_ie(pkt->payload, pkt->rx_ctrl.sig_len, r->ssid, r->capabilities);
             mac_count++;
             ESP_LOGI(TAG, "Ch %d | New AP: %s", current_wifi_ch, r->ssid);
@@ -133,13 +139,12 @@ void wifi_init_sniffer(void) {
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_NULL));
     ESP_ERROR_CHECK(esp_wifi_start());
-    // Promiscuous remains OFF until channel is assigned
     ESP_ERROR_CHECK(esp_wifi_set_promiscuous_rx_cb(&wifi_sniffer_packet_handler));
 }
 
 void app_main(void) {
     vTaskDelay(pdMS_TO_TICKS(2000));
-    ESP_LOGI(TAG, "Worker ready. Waiting for SPI channel assignment...");
+    ESP_LOGI(TAG, "Worker ready.");
     
     mac_mutex = xSemaphoreCreateMutex();
     mac_table = heap_caps_calloc(MAX_MACS, sizeof(wigle_record_t), MALLOC_CAP_INTERNAL);
@@ -159,37 +164,53 @@ void app_main(void) {
     controller_msg_t *rx = heap_caps_calloc(1, sizeof(controller_msg_t), MALLOC_CAP_DMA);
 
     while (1) {
+        // 1. Prepare buffer with oldest unsent records
         tx->status = HANDSHAKE_ACK;
+        memset(tx->data, 0, sizeof(tx->data));
+        in_flight_count = 0;
+
         if (xSemaphoreTake(mac_mutex, pdMS_TO_TICKS(10)) == pdTRUE) {
-            tx->reserved = (uint8_t)(mac_count & 0xFF);
-            size_t bytes = mac_count * sizeof(wigle_record_t);
-            if (bytes > sizeof(tx->data)) bytes = sizeof(tx->data);
-            memcpy(tx->data, mac_table, bytes);
+            for (int i = 0; i < mac_count && in_flight_count < RECORDS_PER_BUFFER; i++) {
+                if (mac_table[i].sent == 0) {
+                    memcpy(tx->data + (in_flight_count * sizeof(wigle_record_t)), &mac_table[i], sizeof(wigle_record_t));
+                    in_flight_indices[in_flight_count] = i;
+                    in_flight_count++;
+                }
+            }
+            tx->reserved = (uint8_t)in_flight_count;
             xSemaphoreGive(mac_mutex);
         }
         tx->checksum = calculate_checksum(tx->data, sizeof(tx->data));
 
+        // 2. Transmit
         spi_slave_transaction_t t = {
             .length = PAYLOAD_SIZE * 8, .tx_buffer = tx, .rx_buffer = rx
         };
         
         if (spi_slave_transmit(SPI2_HOST, &t, portMAX_DELAY) == ESP_OK) {
-            // Check for valid channel in every SPI frame
+            // 3. Mark as sent on success
+            if (in_flight_count > 0) {
+                xSemaphoreTake(mac_mutex, portMAX_DELAY);
+                for (int i = 0; i < in_flight_count; i++) {
+                    mac_table[in_flight_indices[i]].sent = 1;
+                }
+                xSemaphoreGive(mac_mutex);
+            }
+
+            // 4. Process incoming controller data
             if (rx->wifi_channel >= 1 && rx->wifi_channel <= 14) {
                 current_unix_time = rx->unix_time;
                 current_gps = rx->gps;
 
                 if (rx->wifi_channel != current_wifi_ch) {
-                    ESP_LOGI(TAG, "Assigning Channel: %d (Old: %d). Clearing table.", rx->wifi_channel, current_wifi_ch);
-                    
+                    ESP_LOGI(TAG, "New Channel: %d. Resetting table.", rx->wifi_channel);
                     xSemaphoreTake(mac_mutex, portMAX_DELAY);
                     mac_count = 0;
                     memset(mac_table, 0, MAX_MACS * sizeof(wigle_record_t));
                     current_wifi_ch = rx->wifi_channel;
-                    
-                    esp_wifi_set_promiscuous(false); // Stop while changing
+                    esp_wifi_set_promiscuous(false);
                     esp_wifi_set_channel(current_wifi_ch, WIFI_SECOND_CHAN_NONE);
-                    esp_wifi_set_promiscuous(true);  // Start/Restart scanning
+                    esp_wifi_set_promiscuous(true);
                     xSemaphoreGive(mac_mutex);
                 }
             }

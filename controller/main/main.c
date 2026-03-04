@@ -58,6 +58,7 @@ typedef struct __attribute__((packed)) {
     float lat;
     float lon;
     uint32_t hits;
+    uint8_t sent;
 } wigle_record_t;
 
 static const uint8_t popular_channels[] = {1, 6, 11, 2, 7, 12, 3, 8, 13, 4, 9, 5, 10, 14};
@@ -78,7 +79,7 @@ void app_main(void) {
     int cs_pins[3] = {GPIO_CS1, GPIO_CS2, GPIO_CS3};
     for (int i = 0; i < 3; i++) {
         spi_device_interface_config_t devcfg = {
-            .clock_speed_hz = 500 * 1000, 
+            .clock_speed_hz = 1 * 1000 * 1000, 
             .mode = 0,
             .spics_io_num = cs_pins[i],
             .queue_size = 7,
@@ -106,12 +107,12 @@ void app_main(void) {
                     uint16_t cal = calculate_checksum(rx->data, sizeof(rx->data));
                     if (rx->checksum == cal) {
                         int count = rx->reserved;
-                        ESP_LOGI(TAG, "Worker %d OK. APs: %d", i+1, count);
+                        ESP_LOGI(TAG, "Worker %d OK. Records in packet: %d", i+1, count);
                         wigle_record_t *rec = (wigle_record_t *)rx->data;
                         for (int j = 0; j < (count > 2 ? 2 : count); j++) {
-                            ESP_LOGI(TAG, "  [%d] %s (%02X:%02X:%02X:%02X:%02X:%02X) RSSI:%d", 
-                                     j, rec[j].ssid, rec[j].bssid[0], rec[j].bssid[1], rec[j].bssid[2],
-                                     rec[j].bssid[3], rec[j].bssid[4], rec[j].bssid[5], rec[j].rssi);
+                            ESP_LOGI(TAG, "  AP: %s (%02X:%02X:%02X:%02X:%02X:%02X) RSSI:%d Hits:%lu", 
+                                     rec[j].ssid, rec[j].bssid[0], rec[j].bssid[1], rec[j].bssid[2],
+                                     rec[j].bssid[3], rec[j].bssid[4], rec[j].bssid[5], rec[j].rssi, (unsigned long)rec[j].hits);
                         }
                     } else ESP_LOGE(TAG, "Worker %d Checksum Fail!", i+1);
                 } else ESP_LOGW(TAG, "Worker %d Handshake Fail (0x%02X)", i+1, rx->status);
