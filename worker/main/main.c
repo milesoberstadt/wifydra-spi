@@ -15,6 +15,14 @@ static const char *TAG = "WORKER";
 #define GPIO_MOSI 9
 #define GPIO_CS   2
 
+/**
+ * SPI SLAVE TRANSACTION SIZE LIMITS:
+ * 1. DMA Alignment: Buffers must be word-aligned and allocated in DMA-capable RAM.
+ * 2. Maximum Size: The default limit is 4092 bytes. To exceed this, 'max_transfer_sz' 
+ *    must be set in 'spi_bus_config_t'.
+ * 3. Stability: Large transactions (e.g., >32KB) increase the risk of desync if the 
+ *    master's clock is too fast or if the slave CPU is heavily loaded.
+ */
 #define PAYLOAD_SIZE 5100
 #define HANDSHAKE_CMD 0xAB
 #define HANDSHAKE_ACK 0xBA

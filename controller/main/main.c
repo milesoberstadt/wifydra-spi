@@ -16,7 +16,17 @@ static const char *TAG = "CONTROLLER";
 #define GPIO_CS2   4
 #define GPIO_CS3  16
 
-#define PAYLOAD_SIZE 5100 // Extra buffer for checksum/header
+/**
+ * SPI TRANSACTION SIZE LIMITS:
+ * 1. Default Limit: Without setting 'max_transfer_sz', the SPI driver defaults to 4092 bytes
+ *    when DMA is enabled.
+ * 2. Hardware/Driver Max: By setting 'max_transfer_sz', you can technically transfer up to
+ *    64KB or more, provided you have a contiguous block of DMA-capable RAM.
+ * 3. Safe Practice: For payloads over 4KB, always explicitly set 'max_transfer_sz' in the 
+ *    bus configuration and use 'MALLOC_CAP_DMA' for buffer allocation.
+ */
+#define PAYLOAD_SIZE 5100
+ // Extra buffer for checksum/header
 #define HANDSHAKE_CMD 0xAB
 #define HANDSHAKE_ACK 0xBA
 
@@ -52,7 +62,7 @@ void app_main(void) {
     int cs_pins[3] = {GPIO_CS1, GPIO_CS2, GPIO_CS3};
     for (int i = 0; i < 3; i++) {
         spi_device_interface_config_t devcfg = {
-            .clock_speed_hz = 500 * 1000,      // 500 kHz for signal integrity
+            .clock_speed_hz = 1 * 1000 * 1000, // 1 MHz
             .mode = 0,                         // SPI Mode 0
             .spics_io_num = cs_pins[i],        // CS pin for this worker
             .queue_size = 7,
