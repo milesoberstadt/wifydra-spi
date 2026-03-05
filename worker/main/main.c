@@ -107,19 +107,40 @@ void wifi_sniffer_packet_handler(void* buf, wifi_promiscuous_pkt_type_t type) {
                 break;
             }
         }
-        if (!found && mac_count < MAX_MACS) {
-            wigle_record_t *r = &mac_table[mac_count];
-            memcpy(r->bssid, bssid, 6);
-            r->hits = 1;
-            r->first_seen = current_unix_time;
-            r->channel = current_wifi_ch;
-            r->rssi = pkt->rx_ctrl.rssi;
-            r->lat = current_gps.latitude;
-            r->lon = current_gps.longitude;
-            r->sent = 0;
-            parse_beacon_ie(pkt->payload, pkt->rx_ctrl.sig_len, r->ssid, r->capabilities);
-            mac_count++;
-            ESP_LOGI(TAG, "Ch %d | New AP: %s", current_wifi_ch, r->ssid);
+        if (!found) {
+            if (mac_count < MAX_MACS) {
+                // Table not full, add to end
+                wigle_record_t *r = &mac_table[mac_count];
+                memcpy(r->bssid, bssid, 6);
+                r->hits = 1;
+                r->first_seen = current_unix_time;
+                r->channel = current_wifi_ch;
+                r->rssi = pkt->rx_ctrl.rssi;
+                r->lat = current_gps.latitude;
+                r->lon = current_gps.longitude;
+                r->sent = 0;
+                parse_beacon_ie(pkt->payload, pkt->rx_ctrl.sig_len, r->ssid, r->capabilities);
+                mac_count++;
+                ESP_LOGI(TAG, "New AP [%d]: %s", mac_count, r->ssid);
+            } else {
+                // Table FULL. Look for a record that was already sent to overwrite.
+                for (int i = 0; i < MAX_MACS; i++) {
+                    if (mac_table[i].sent == 1) {
+                        wigle_record_t *r = &mac_table[i];
+                        memcpy(r->bssid, bssid, 6);
+                        r->hits = 1;
+                        r->first_seen = current_unix_time;
+                        r->channel = current_wifi_ch;
+                        r->rssi = pkt->rx_ctrl.rssi;
+                        r->lat = current_gps.latitude;
+                        r->lon = current_gps.longitude;
+                        r->sent = 0; // Mark as unsent again
+                        parse_beacon_ie(pkt->payload, pkt->rx_ctrl.sig_len, r->ssid, r->capabilities);
+                        ESP_LOGI(TAG, "Table full, overwriting sent record with: %s", r->ssid);
+                        break;
+                    }
+                }
+            }
         }
         xSemaphoreGive(mac_mutex);
     }
