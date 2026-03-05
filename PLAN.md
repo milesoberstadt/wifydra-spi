@@ -22,21 +22,22 @@ All devices share a common **GND**.
 | **MOSI** | GPIO 23 | GPIO 9 |
 | **GND** | GND | GND |
 
-### Current Chip Select (CS) Connections (Unique)
+### Chip Select (CS) Connections (Unique)
 | Target | ESP32 (Controller CS Pin) | ESP32-S3 (Worker CS Pin) |
 | :--- | :--- | :--- |
 | **Worker 1** | GPIO 5 | GPIO 2 |
 | **Worker 2** | GPIO 4 | GPIO 2 |
-| **Worker 3** | GPIO 16 | GPIO 2 |
+| **Worker 3** | GPIO 32 | GPIO 2 |
 
 ### GPS & SD Card Connections (Controller Only)
 | Peripheral | Signal | ESP32 (Controller) | Notes |
 | :--- | :--- | :--- | :--- |
 | **GPS (UART2)** | TX | GPIO 17 | Connect to GPS RX |
-| **GPS (UART2)** | RX | GPIO 21 | Connect to GPS TX |
+| **GPS (UART2)** | RX | GPIO 16 | Connect to GPS TX |
 | **SD Card (SDMMC)**| CLK | GPIO 14 | 1-bit mode |
 | **SD Card (SDMMC)**| CMD | GPIO 15 | 1-bit mode |
 | **SD Card (SDMMC)**| D0 | GPIO 2 | 1-bit mode |
+
 
 ---
 

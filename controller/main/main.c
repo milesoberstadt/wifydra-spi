@@ -4,8 +4,11 @@
 #include "freertos/task.h"
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
+#include "driver/uart.h"
 #include "esp_log.h"
 #include "esp_heap_caps.h"
+#include "nvs_flash.h"
+#include "nvs.h"
 
 static const char *TAG = "CONTROLLER";
 
@@ -14,24 +17,38 @@ static const char *TAG = "CONTROLLER";
 #define GPIO_MOSI 23
 #define GPIO_CS1   5
 #define GPIO_CS2   4
-#define GPIO_CS3  16
+#define GPIO_CS3  32
+
+// GPS UART Config
+#define GPS_UART_NUM UART_NUM_2
+#define GPS_TX_PIN 17
+#define GPS_RX_PIN 16
+#define GPS_BUF_SIZE 1024
 
 #define PAYLOAD_SIZE 5100
 #define HANDSHAKE_CMD 0xAB
 #define HANDSHAKE_ACK 0xBA
 
+// NVS Keys
+#define NVS_NAMESPACE "gps_data"
+#define NVS_KEY_LAT "last_lat"
+#define NVS_KEY_LON "last_lon"
+
 spi_device_handle_t workers[3];
+
+typedef struct __attribute__((packed)) {
+    float latitude;
+    float longitude;
+} gps_coords_t;
+
+static gps_coords_t current_gps = { .latitude = 0.0f, .longitude = 0.0f };
+static uint32_t current_unix_time = 1740950400; // Default start time
 
 uint16_t calculate_checksum(const uint8_t *data, size_t len) {
     uint32_t sum = 0;
     for (size_t i = 0; i < len; i++) sum += data[i];
     return (uint16_t)(sum & 0xFFFF);
 }
-
-typedef struct __attribute__((packed)) {
-    float latitude;
-    float longitude;
-} gps_coords_t;
 
 typedef struct __attribute__((packed)) {
     uint8_t command;
@@ -63,10 +80,134 @@ typedef struct __attribute__((packed)) {
 
 static const uint8_t popular_channels[] = {1, 6, 11, 2, 7, 12, 3, 8, 13, 4, 9, 5, 10, 14};
 static uint8_t worker_current_channels[3]; 
-static const gps_coords_t static_gps = { .latitude = 37.7749f, .longitude = -122.4194f };
+
+// NMEA Parsing State
+static bool gps_data_seen = false;
+static bool gps_fix_acquired = false;
+
+// Simple coordinate parser (ddmm.mmmm -> decimal degrees)
+float parse_coord(char *str, char dir) {
+    if (!str || strlen(str) < 4) return 0.0f;
+    float raw = atof(str);
+    int deg = (int)(raw / 100);
+    float min = raw - (deg * 100);
+    float val = deg + (min / 60.0f);
+    if (dir == 'S' || dir == 'W') val = -val;
+    return val;
+}
+
+void save_gps_to_nvs(float lat, float lon) {
+    nvs_handle_t my_handle;
+    esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &my_handle);
+    if (err != ESP_OK) return;
+
+    nvs_set_u32(my_handle, NVS_KEY_LAT, *((uint32_t*)&lat));
+    nvs_set_u32(my_handle, NVS_KEY_LON, *((uint32_t*)&lon));
+    nvs_commit(my_handle);
+    nvs_close(my_handle);
+    ESP_LOGI(TAG, "Saved GPS to NVS: %.4f, %.4f", lat, lon);
+}
+
+void load_gps_from_nvs() {
+    nvs_handle_t my_handle;
+    esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READONLY, &my_handle);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "No saved GPS data found.");
+        return;
+    }
+
+    uint32_t lat_int, lon_int;
+    if (nvs_get_u32(my_handle, NVS_KEY_LAT, &lat_int) == ESP_OK &&
+        nvs_get_u32(my_handle, NVS_KEY_LON, &lon_int) == ESP_OK) {
+        
+        current_gps.latitude = *((float*)&lat_int);
+        current_gps.longitude = *((float*)&lon_int);
+        ESP_LOGI(TAG, "Loaded GPS from NVS: %.4f, %.4f", current_gps.latitude, current_gps.longitude);
+    }
+    nvs_close(my_handle);
+}
+
+// $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
+void parse_nmea_rmc(char *line) {
+    if (!gps_data_seen) {
+        ESP_LOGI(TAG, "GPS Data stream detected.");
+        gps_data_seen = true;
+    }
+
+    if (strncmp(line, "$GPRMC", 6) == 0 || strncmp(line, "$GNRMC", 6) == 0) {
+        char *token;
+        char *rest = line;
+        int field = 0;
+        char *time = NULL, *status = NULL, *lat = NULL, *ns = NULL, *lon = NULL, *ew = NULL;
+
+        while ((token = strsep(&rest, ",")) != NULL) {
+            switch (field) {
+                case 1: time = token; break;
+                case 2: status = token; break;
+                case 3: lat = token; break;
+                case 4: ns = token; break;
+                case 5: lon = token; break;
+                case 6: ew = token; break;
+            }
+            field++;
+        }
+
+        if (status && strcmp(status, "A") == 0) {
+            float new_lat = parse_coord(lat, ns ? ns[0] : 'N');
+            float new_lon = parse_coord(lon, ew ? ew[0] : 'E');
+
+            if (!gps_fix_acquired) {
+                ESP_LOGI(TAG, "GPS Fix Acquired! Lat: %.4f, Lon: %.4f", new_lat, new_lon);
+                gps_fix_acquired = true;
+                save_gps_to_nvs(new_lat, new_lon);
+            }
+            
+            current_gps.latitude = new_lat;
+            current_gps.longitude = new_lon;
+        }
+    }
+}
+
+void gps_task(void *pvParameters) {
+    uart_config_t uart_config = {
+        .baud_rate = 9600,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_DEFAULT,
+    };
+    ESP_ERROR_CHECK(uart_driver_install(GPS_UART_NUM, GPS_BUF_SIZE * 2, 0, 0, NULL, 0));
+    ESP_ERROR_CHECK(uart_param_config(GPS_UART_NUM, &uart_config));
+    ESP_ERROR_CHECK(uart_set_pin(GPS_UART_NUM, GPS_TX_PIN, GPS_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+
+    uint8_t *data = (uint8_t *)malloc(GPS_BUF_SIZE);
+    while (1) {
+        int len = uart_read_bytes(GPS_UART_NUM, data, GPS_BUF_SIZE - 1, pdMS_TO_TICKS(500));
+        if (len > 0) {
+            data[len] = '\0';
+            parse_nmea_rmc((char *)data);
+        }
+    }
+}
 
 void app_main(void) {
     ESP_LOGI(TAG, "Controller starting...");
+    
+    // Initialize NVS
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+
+    // Load last known position for warm start
+    load_gps_from_nvs();
+
+    // Start GPS Task
+    xTaskCreate(gps_task, "gps_task", 4096, NULL, 5, NULL);
+
     vTaskDelay(pdMS_TO_TICKS(1000));
     for(int i=0; i<3; i++) worker_current_channels[i] = popular_channels[i];
 
@@ -90,7 +231,6 @@ void app_main(void) {
 
     controller_msg_t *tx = heap_caps_calloc(1, sizeof(controller_msg_t), MALLOC_CAP_DMA);
     worker_msg_t *rx = heap_caps_calloc(1, sizeof(worker_msg_t), MALLOC_CAP_DMA);
-    uint32_t simulated_time = 1740950400; 
 
     while (1) {
         for (int i = 0; i < 3; i++) {
@@ -98,8 +238,8 @@ void app_main(void) {
             memset(tx, 0, sizeof(controller_msg_t));
             tx->command = HANDSHAKE_CMD;
             tx->wifi_channel = worker_current_channels[i];
-            tx->unix_time = simulated_time;
-            tx->gps = static_gps;
+            tx->unix_time = current_unix_time; // Send live GPS time
+            tx->gps = current_gps;             // Send live coordinates
 
             spi_transaction_t t = { .length = PAYLOAD_SIZE * 8, .tx_buffer = tx, .rx_buffer = rx };
             if (spi_device_transmit(workers[i], &t) == ESP_OK) {
@@ -107,7 +247,7 @@ void app_main(void) {
                     uint16_t cal = calculate_checksum(rx->data, sizeof(rx->data));
                     if (rx->checksum == cal) {
                         int count = rx->reserved;
-                        ESP_LOGI(TAG, "Worker %d OK. Records in packet: %d", i+1, count);
+                        ESP_LOGI(TAG, "Worker %d OK. APs: %d", i+1, count);
                         wigle_record_t *rec = (wigle_record_t *)rx->data;
                         for (int j = 0; j < (count > 2 ? 2 : count); j++) {
                             ESP_LOGI(TAG, "  AP: %s (%02X:%02X:%02X:%02X:%02X:%02X) RSSI:%d Hits:%lu", 
@@ -119,7 +259,12 @@ void app_main(void) {
             }
             vTaskDelay(pdMS_TO_TICKS(1000));
         }
-        simulated_time += 15;
+        
+        // If GPS isn't fixing, manually increment time for testing
+        if (current_gps.latitude == 0.0f) {
+            current_unix_time += 15;
+        }
+        
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
