@@ -12,6 +12,10 @@
 
 static const char *TAG = "CONTROLLER";
 
+// --- Configuration ---
+#define CONFIG_WAIT_FOR_GPS_FIX true  // If true, controller won't poll workers until GPS has a fix
+// ---------------------
+
 #define GPIO_SCLK 18
 #define GPIO_MISO 19
 #define GPIO_MOSI 23
@@ -325,6 +329,16 @@ void app_main(void) {
 
     controller_msg_t *tx = heap_caps_calloc(1, sizeof(controller_msg_t), MALLOC_CAP_DMA);
     worker_msg_t *rx = heap_caps_calloc(1, sizeof(worker_msg_t), MALLOC_CAP_DMA);
+
+    if (CONFIG_WAIT_FOR_GPS_FIX) {
+        ESP_LOGI(TAG, "Waiting for valid GPS fix before polling workers...");
+        while (!gps_fix_acquired) {
+            vTaskDelay(pdMS_TO_TICKS(1000));
+        }
+        ESP_LOGI(TAG, "GPS Fix acquired! Starting Worker Polling...");
+    } else {
+        ESP_LOGI(TAG, "Starting Worker Polling (Using last-known NVS GPS if available)...");
+    }
 
     while (1) {
         for (int i = 0; i < 3; i++) {
