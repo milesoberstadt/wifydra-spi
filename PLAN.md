@@ -122,3 +122,10 @@ All devices share a common **GND**.
 2. [ ] Implement Wigle CSV file rotation and header writing.
 3. [ ] Final integration: SPI data -> SD card.
 4. [ ] Prototype Phase 9 CS multiplexing hardware.
+
+## 7. Shopping list
+1. SDMMC compatible microsd sniffer
+2. USB bulkhead
+3. CS Multiplexer (74HC154 or MCP23017)
+4. 15x XIAO ESP32-C6 modules
+5. 15x 10k resistors
