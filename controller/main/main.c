@@ -18,6 +18,7 @@ static const char *TAG = "CONTROLLER";
 #define GPIO_CS1   5
 #define GPIO_CS2   4
 #define GPIO_CS3  32
+#define GPIO_LED   2
 
 // GPS UART Config
 #define GPS_UART_NUM UART_NUM_2
@@ -138,11 +139,10 @@ void parse_nmea_rmc(char *line) {
         char *token;
         char *rest = line;
         int field = 0;
-        char *time = NULL, *status = NULL, *lat = NULL, *ns = NULL, *lon = NULL, *ew = NULL;
+        char *status = NULL, *lat = NULL, *ns = NULL, *lon = NULL, *ew = NULL;
 
         while ((token = strsep(&rest, ",")) != NULL) {
             switch (field) {
-                case 1: time = token; break;
                 case 2: status = token; break;
                 case 3: lat = token; break;
                 case 4: ns = token; break;
@@ -191,9 +191,32 @@ void gps_task(void *pvParameters) {
     }
 }
 
+void status_led_task(void *pvParameters) {
+    gpio_reset_pin(GPIO_LED);
+    gpio_set_direction(GPIO_LED, GPIO_MODE_OUTPUT);
+    
+    while (1) {
+        if (gps_fix_acquired) {
+            gpio_set_level(GPIO_LED, 1);
+            vTaskDelay(pdMS_TO_TICKS(500));
+        } else if (gps_data_seen) {
+            gpio_set_level(GPIO_LED, 1);
+            vTaskDelay(pdMS_TO_TICKS(200));
+            gpio_set_level(GPIO_LED, 0);
+            vTaskDelay(pdMS_TO_TICKS(200));
+        } else {
+            gpio_set_level(GPIO_LED, 0);
+            vTaskDelay(pdMS_TO_TICKS(500));
+        }
+    }
+}
+
 void app_main(void) {
     ESP_LOGI(TAG, "Controller starting...");
     
+    // Start Status LED Task
+    xTaskCreate(status_led_task, "status_led_task", 2048, NULL, 5, NULL);
+
     // Initialize NVS
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
