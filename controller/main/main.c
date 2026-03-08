@@ -128,6 +128,73 @@ void load_gps_from_nvs() {
     nvs_close(my_handle);
 }
 
+// UBX Checksum calculation (Fletcher-8)
+void ubx_checksum(uint8_t *data, size_t len, uint8_t *ck_a, uint8_t *ck_b) {
+    *ck_a = 0;
+    *ck_b = 0;
+    for (size_t i = 0; i < len; i++) {
+        *ck_a += data[i];
+        *ck_b += *ck_a;
+    }
+}
+
+// Send a raw UBX message over UART
+void ubx_send_message(uint8_t class, uint8_t id, uint16_t len, uint8_t *payload) {
+    uint8_t header[6] = {
+        0xB5, 0x62, 
+        class, id, 
+        (uint8_t)(len & 0xFF), (uint8_t)((len >> 8) & 0xFF)
+    };
+    uint8_t ck_a, ck_b;
+    
+    // Checksum is calculated over Class, ID, Length, and Payload
+    uint8_t *chk_buf = malloc(len + 4);
+    chk_buf[0] = class;
+    chk_buf[1] = id;
+    chk_buf[2] = header[4];
+    chk_buf[3] = header[5];
+    if (len > 0) memcpy(&chk_buf[4], payload, len);
+    
+    ubx_checksum(chk_buf, len + 4, &ck_a, &ck_b);
+    free(chk_buf);
+
+    uart_write_bytes(GPS_UART_NUM, header, 6);
+    if (len > 0) uart_write_bytes(GPS_UART_NUM, payload, len);
+    uint8_t footer[2] = {ck_a, ck_b};
+    uart_write_bytes(GPS_UART_NUM, footer, 2);
+}
+
+// Assist GPS module with last known position (UBX-AID-INI)
+void ubx_assist_cold_start(float lat, float lon) {
+    if (lat == 0.0f && lon == 0.0f) return;
+
+    ESP_LOGI(TAG, "Sending UBX assistance: %.4f, %.4f", lat, lon);
+
+    typedef struct __attribute__((packed)) {
+        int32_t ecefX_or_lat;
+        int32_t ecefY_or_lon;
+        int32_t ecefZ_or_alt;
+        uint32_t posAcc;
+        uint16_t tmCfg;
+        uint16_t wn;
+        uint32_t tow;
+        int32_t towNs;
+        int32_t tAcc;
+        int32_t fAcc;
+        int32_t clkD;
+        uint32_t clkDAcc;
+        uint32_t flags;
+    } ubx_aid_ini_t;
+
+    ubx_aid_ini_t msg = {0};
+    msg.ecefX_or_lat = (int32_t)(lat * 1e7);
+    msg.ecefY_or_lon = (int32_t)(lon * 1e7);
+    msg.posAcc = 100000; // 1km accuracy for assistance
+    msg.flags = 0x01 | 0x20; // 0x01 = pos valid, 0x20 = alt invalid (use 2D)
+
+    ubx_send_message(0x0B, 0x01, sizeof(msg), (uint8_t *)&msg);
+}
+
 // $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
 void parse_nmea_rmc(char *line) {
     if (!gps_data_seen) {
@@ -169,18 +236,6 @@ void parse_nmea_rmc(char *line) {
 }
 
 void gps_task(void *pvParameters) {
-    uart_config_t uart_config = {
-        .baud_rate = 9600,
-        .data_bits = UART_DATA_8_BITS,
-        .parity = UART_PARITY_DISABLE,
-        .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-        .source_clk = UART_SCLK_DEFAULT,
-    };
-    ESP_ERROR_CHECK(uart_driver_install(GPS_UART_NUM, GPS_BUF_SIZE * 2, 0, 0, NULL, 0));
-    ESP_ERROR_CHECK(uart_param_config(GPS_UART_NUM, &uart_config));
-    ESP_ERROR_CHECK(uart_set_pin(GPS_UART_NUM, GPS_TX_PIN, GPS_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
-
     uint8_t *data = (uint8_t *)malloc(GPS_BUF_SIZE);
     while (1) {
         int len = uart_read_bytes(GPS_UART_NUM, data, GPS_BUF_SIZE - 1, pdMS_TO_TICKS(500));
@@ -228,7 +283,23 @@ void app_main(void) {
     // Load last known position for warm start
     load_gps_from_nvs();
 
-    // Start GPS Task
+    // Configure UART for GPS early to send assistance
+    uart_config_t uart_config = {
+        .baud_rate = 9600,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_DEFAULT,
+    };
+    ESP_ERROR_CHECK(uart_driver_install(GPS_UART_NUM, GPS_BUF_SIZE * 2, 0, 0, NULL, 0));
+    ESP_ERROR_CHECK(uart_param_config(GPS_UART_NUM, &uart_config));
+    ESP_ERROR_CHECK(uart_set_pin(GPS_UART_NUM, GPS_TX_PIN, GPS_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+
+    // Send assistance data to GPS module
+    ubx_assist_cold_start(current_gps.latitude, current_gps.longitude);
+
+    // Start GPS Task (which now just reads from the already configured UART)
     xTaskCreate(gps_task, "gps_task", 4096, NULL, 5, NULL);
 
     vTaskDelay(pdMS_TO_TICKS(1000));

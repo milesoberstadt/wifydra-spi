@@ -76,12 +76,12 @@ All devices share a common **GND**.
 - Added Beacon frame filtering and IE parsing (SSID/Capabilities).
 - Implemented Wigle-compatible record tracking with "Sent" status and Smart Overwrite.
 
-### Phase 7: GPS Integration (NEO-6M) [TODO]
+### Phase 7: GPS Integration (NEO-6M) [DONE]
 - **UART Setup:** Configure UART2 for NMEA data at 9600 baud.
 - **NMEA Parsing:** Implement parser to extract Lat, Lon, Altitude, and Time.
 - **Warm Start Optimization:** 
     - Store last-known coordinates in NVS (flash).
-    - On boot, send UBX commands to the module to seed location for faster lock.
+    - **UBX Helper:** Send `UBX-AID-INI` on boot to seed location for faster lock.
 - **Sync:** Pass live GPS and Unix time to workers via SPI.
 
 ### Phase 8: Persistent Storage (SDMMC) [TODO]
@@ -112,12 +112,13 @@ All devices share a common **GND**.
 8. [x] Implement Wigle-compatible data structures and SPI reporting.
 9. [x] Optimize for 1MHz stability with double buffering.
 
+10. [x] Implement UART2 driver for NEO-6M on Controller.
+11. [x] Implement NMEA parsing for RMC sentences.
+12. [x] Implement NVS storage for last-known GPS location.
+13. [x] Implement UBX protocol helper for assisted cold-start.
+
 ## 6. Upcoming Tasks
-1. [ ] Implement UART2 driver for NEO-6M on Controller.
-2. [ ] Integrate NMEA parsing library.
-3. [ ] Implement NVS storage for last-known GPS location.
-4. [ ] Implement UBX protocol helper for assisted cold-start.
-5. [ ] Initialize SDMMC and verify SD card mounting.
-6. [ ] Implement Wigle CSV file rotation and header writing.
-7. [ ] Final integration: SPI data -> SD card.
-8. [ ] Prototype Phase 9 CS multiplexing hardware.
+1. [ ] Initialize SDMMC and verify SD card mounting.
+2. [ ] Implement Wigle CSV file rotation and header writing.
+3. [ ] Final integration: SPI data -> SD card.
+4. [ ] Prototype Phase 9 CS multiplexing hardware.
