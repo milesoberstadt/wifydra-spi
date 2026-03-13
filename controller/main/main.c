@@ -9,6 +9,9 @@
 #include "esp_heap_caps.h"
 #include "nvs_flash.h"
 #include "nvs.h"
+#include "esp_vfs_fat.h"
+#include "sdmmc_cmd.h"
+#include "driver/sdmmc_host.h"
 
 static const char *TAG = "CONTROLLER";
 
@@ -22,7 +25,7 @@ static const char *TAG = "CONTROLLER";
 #define GPIO_CS1   5
 #define GPIO_CS2   4
 #define GPIO_CS3  32
-#define GPIO_LED   2
+#define GPIO_LED  27
 
 // GPS UART Config
 #define GPS_UART_NUM UART_NUM_2
@@ -89,6 +92,53 @@ static uint8_t worker_current_channels[3];
 // NMEA Parsing State
 static bool gps_data_seen = false;
 static bool gps_fix_acquired = false;
+
+// SD Card Handle
+sdmmc_card_t *card;
+#define MOUNT_POINT "/sdcard"
+
+void init_sd_card() {
+    ESP_LOGI(TAG, "Initializing SD card");
+
+    esp_vfs_fat_sdmmc_mount_config_t mount_config = {
+        .format_if_mount_failed = true,
+        .max_files = 5,
+        .allocation_unit_size = 16 * 1024
+    };
+
+    ESP_LOGI(TAG, "Using SDMMC peripheral");
+    sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+    host.flags = SDMMC_HOST_FLAG_1BIT; 
+    host.max_freq_khz = SDMMC_FREQ_DEFAULT; // 20MHz
+
+    sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
+    slot_config.width = 1; // 1-bit mode
+
+    // Enable internal pullups to compensate for missing hardware resistors
+    gpio_set_pull_mode(15, GPIO_PULLUP_ONLY); // CMD
+    gpio_set_pull_mode(2, GPIO_PULLUP_ONLY);  // D0
+    gpio_set_pull_mode(14, GPIO_PULLUP_ONLY); // CLK
+
+    // Standard ESP32 Slot 1 Pins for 1-bit:
+    // CLK: 14, CMD: 15, D0: 2
+    // These are handled by the driver defaults, but we'll be explicit
+    slot_config.clk = 14;
+    slot_config.cmd = 15;
+    slot_config.d0 = 2;
+
+    esp_err_t ret = esp_vfs_fat_sdmmc_mount(MOUNT_POINT, &host, &slot_config, &mount_config, &card);
+
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) {
+            ESP_LOGE(TAG, "Failed to mount filesystem.");
+        } else {
+            ESP_LOGE(TAG, "Failed to initialize the card (%s). Check wiring and pull-ups.", esp_err_to_name(ret));
+        }
+        return;
+    }
+    ESP_LOGI(TAG, "Filesystem mounted");
+    sdmmc_card_print_info(stdout, card);
+}
 
 // Simple coordinate parser (ddmm.mmmm -> decimal degrees)
 float parse_coord(char *str, char dir) {
@@ -199,6 +249,34 @@ void ubx_assist_cold_start(float lat, float lon) {
     ubx_send_message(0x0B, 0x01, sizeof(msg), (uint8_t *)&msg);
 }
 
+// Logging State
+static char current_log_filename[64] = "";
+static bool log_file_created = false;
+
+const char* WIGLE_HEADER = "WigleWifi-1.0,appRelease=1.0,model=ESP32-Scanner,release=1.0,device=ESP32-Scanner,display=ESP32-Scanner,board=ESP32,brand=Espressif\n"
+                           "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
+
+void create_wigle_log(const char* date, const char* time) {
+    if (log_file_created || !date || !time) return;
+
+    // Sanitize time: GPS often gives "HHMMSS.SS", we only want "HHMMSS"
+    char clean_time[7];
+    strncpy(clean_time, time, 6);
+    clean_time[6] = '\0';
+
+    snprintf(current_log_filename, sizeof(current_log_filename), "%s/%s_%s.csv", MOUNT_POINT, date, clean_time);
+    ESP_LOGI(TAG, "Creating new log file: %s", current_log_filename);
+
+    FILE *f = fopen(current_log_filename, "w");
+    if (f == NULL) {
+        ESP_LOGE(TAG, "Failed to create log file!");
+        return;
+    }
+    fprintf(f, "%s", WIGLE_HEADER);
+    fclose(f);
+    log_file_created = true;
+}
+
 // $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
 void parse_nmea_rmc(char *line) {
     if (!gps_data_seen) {
@@ -210,17 +288,24 @@ void parse_nmea_rmc(char *line) {
         char *token;
         char *rest = line;
         int field = 0;
-        char *status = NULL, *lat = NULL, *ns = NULL, *lon = NULL, *ew = NULL;
+        char *time = NULL, *status = NULL, *lat = NULL, *ns = NULL, *lon = NULL, *ew = NULL, *date = NULL;
 
         while ((token = strsep(&rest, ",")) != NULL) {
             switch (field) {
+                case 1: time = token; break;
                 case 2: status = token; break;
                 case 3: lat = token; break;
                 case 4: ns = token; break;
                 case 5: lon = token; break;
                 case 6: ew = token; break;
+                case 9: date = token; break;
             }
             field++;
+        }
+
+        // Create log file as soon as we have a date/time (even without fix)
+        if (date && time && strlen(date) == 6 && strlen(time) >= 6) {
+            create_wigle_log(date, time);
         }
 
         if (status && strcmp(status, "A") == 0) {
@@ -275,6 +360,9 @@ void app_main(void) {
     
     // Start Status LED Task
     xTaskCreate(status_led_task, "status_led_task", 2048, NULL, 5, NULL);
+
+    // Initialize SD Card
+    init_sd_card();
 
     // Initialize NVS
     esp_err_t ret = nvs_flash_init();
