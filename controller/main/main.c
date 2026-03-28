@@ -290,6 +290,26 @@ void create_wigle_log(const char* date, const char* time) {
     log_file_created = true;
 }
 
+void append_to_wigle_log(const wigle_record_t *rec) {
+    if (!sd_card_ready || !log_file_created || strlen(current_log_filename) == 0) return;
+
+    FILE *f = fopen(current_log_filename, "a");
+    if (f == NULL) {
+        ESP_LOGE(TAG, "Failed to open log file for appending!");
+        return;
+    }
+
+    // Format: MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type
+    // Note: We use fixed placeholders for AuthMode, Altitude and Accuracy as we don't have them all yet
+    fprintf(f, "%02X:%02X:%02X:%02X:%02X:%02X,%s,[WPA2-PSK-CCMP][ESS],2026-03-28 00:00:00,%d,%d,%.6f,%.6f,0,0,WIFI\n",
+            rec->bssid[0], rec->bssid[1], rec->bssid[2],
+            rec->bssid[3], rec->bssid[4], rec->bssid[5],
+            rec->ssid, rec->channel, rec->rssi,
+            rec->lat, rec->lon);
+
+    fclose(f);
+}
+
 // $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
 void parse_nmea_rmc(char *line) {
     if (!gps_data_seen) {
@@ -477,10 +497,13 @@ void app_main(void) {
                         int count = rx->reserved;
                         ESP_LOGI(TAG, "Worker %d OK. APs: %d", i+1, count);
                         wigle_record_t *rec = (wigle_record_t *)rx->data;
-                        for (int j = 0; j < (count > 2 ? 2 : count); j++) {
-                            ESP_LOGI(TAG, "  AP: %s (%02X:%02X:%02X:%02X:%02X:%02X) RSSI:%d Hits:%lu", 
-                                     rec[j].ssid, rec[j].bssid[0], rec[j].bssid[1], rec[j].bssid[2],
-                                     rec[j].bssid[3], rec[j].bssid[4], rec[j].bssid[5], rec[j].rssi, (unsigned long)rec[j].hits);
+                        for (int j = 0; j < count; j++) {
+                            if (j < 2) {
+                                ESP_LOGI(TAG, "  AP: %s (%02X:%02X:%02X:%02X:%02X:%02X) RSSI:%d Hits:%lu", 
+                                         rec[j].ssid, rec[j].bssid[0], rec[j].bssid[1], rec[j].bssid[2],
+                                         rec[j].bssid[3], rec[j].bssid[4], rec[j].bssid[5], rec[j].rssi, (unsigned long)rec[j].hits);
+                            }
+                            append_to_wigle_log(&rec[j]);
                         }
                     } else ESP_LOGE(TAG, "Worker %d Checksum Fail!", i+1);
                 } else ESP_LOGW(TAG, "Worker %d Handshake Fail (0x%02X)", i+1, rx->status);
