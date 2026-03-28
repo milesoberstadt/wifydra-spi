@@ -129,3 +129,4 @@ All devices share a common **GND**.
 3. CS Multiplexer (74HC154 or MCP23017)
 4. 15x XIAO ESP32-C6 modules
 5. 15x 10k resistors
+6. 18650 Battery Holder - https://a.co/d/02SaYOTm

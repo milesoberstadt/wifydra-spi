@@ -10,8 +10,9 @@
 #include "nvs_flash.h"
 #include "nvs.h"
 #include "esp_vfs_fat.h"
-#include "sdmmc_cmd.h"
-#include "driver/sdmmc_host.h"
+#include "driver/sdspi_host.h"
+#include "driver/spi_common.h"
+#include <errno.h>
 
 static const char *TAG = "CONTROLLER";
 
@@ -92,41 +93,34 @@ static uint8_t worker_current_channels[3];
 // NMEA Parsing State
 static bool gps_data_seen = false;
 static bool gps_fix_acquired = false;
+static bool sd_card_ready = false;
 
 // SD Card Handle
 sdmmc_card_t *card;
 #define MOUNT_POINT "/sdcard"
 
 void init_sd_card() {
-    ESP_LOGI(TAG, "Initializing SD card");
+    ESP_LOGI(TAG, "Initializing SD card (SPI)");
 
-    esp_vfs_fat_sdmmc_mount_config_t mount_config = {
+    esp_vfs_fat_mount_config_t mount_config = {
         .format_if_mount_failed = true,
         .max_files = 5,
         .allocation_unit_size = 16 * 1024
     };
 
-    ESP_LOGI(TAG, "Using SDMMC peripheral");
-    sdmmc_host_t host = SDMMC_HOST_DEFAULT();
-    host.flags = SDMMC_HOST_FLAG_1BIT; 
-    host.max_freq_khz = SDMMC_FREQ_DEFAULT; // 20MHz
+    ESP_LOGI(TAG, "Using SPI peripheral");
 
-    sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
-    slot_config.width = 1; // 1-bit mode
+    // Host configuration
+    sdmmc_host_t host = SDSPI_HOST_DEFAULT();
+    host.slot = HSPI_HOST; // Use the same host as workers
+    host.max_freq_khz = 1000; // Lower to 1MHz for stability
 
-    // Enable internal pullups to compensate for missing hardware resistors
-    gpio_set_pull_mode(15, GPIO_PULLUP_ONLY); // CMD
-    gpio_set_pull_mode(2, GPIO_PULLUP_ONLY);  // D0
-    gpio_set_pull_mode(14, GPIO_PULLUP_ONLY); // CLK
-
-    // Standard ESP32 Slot 1 Pins for 1-bit:
-    // CLK: 14, CMD: 15, D0: 2
-    // These are handled by the driver defaults, but we'll be explicit
-    slot_config.clk = 14;
-    slot_config.cmd = 15;
-    slot_config.d0 = 2;
-
-    esp_err_t ret = esp_vfs_fat_sdmmc_mount(MOUNT_POINT, &host, &slot_config, &mount_config, &card);
+    // Device configuration
+    sdspi_device_config_t dev_config = SDSPI_DEVICE_CONFIG_DEFAULT();
+    dev_config.gpio_cs = 13; // User specified CS pin
+    dev_config.host_id = HSPI_HOST; // Explicitly set host ID
+    
+    esp_err_t ret = esp_vfs_fat_sdspi_mount(MOUNT_POINT, &host, &dev_config, &mount_config, &card);
 
     if (ret != ESP_OK) {
         if (ret == ESP_FAIL) {
@@ -137,7 +131,7 @@ void init_sd_card() {
         return;
     }
     ESP_LOGI(TAG, "Filesystem mounted");
-    sdmmc_card_print_info(stdout, card);
+    sd_card_ready = true;
 }
 
 // Simple coordinate parser (ddmm.mmmm -> decimal degrees)
@@ -257,19 +251,20 @@ const char* WIGLE_HEADER = "WigleWifi-1.0,appRelease=1.0,model=ESP32-Scanner,rel
                            "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
 
 void create_wigle_log(const char* date, const char* time) {
-    if (log_file_created || !date || !time) return;
+    if (!sd_card_ready || log_file_created || !date || !time) return;
 
     // Sanitize time: GPS often gives "HHMMSS.SS", we only want "HHMMSS"
     char clean_time[7];
     strncpy(clean_time, time, 6);
     clean_time[6] = '\0';
 
-    snprintf(current_log_filename, sizeof(current_log_filename), "%s/%s_%s.csv", MOUNT_POINT, date, clean_time);
+    // Use a unique 8.3 compliant filename: HHMMSS.csv (6 characters + .csv)
+    snprintf(current_log_filename, sizeof(current_log_filename), "%s/%s.csv", MOUNT_POINT, clean_time);
     ESP_LOGI(TAG, "Creating new log file: %s", current_log_filename);
 
     FILE *f = fopen(current_log_filename, "w");
     if (f == NULL) {
-        ESP_LOGE(TAG, "Failed to create log file!");
+        ESP_LOGE(TAG, "Failed to create log file! (errno: %d, %s)", errno, strerror(errno));
         return;
     }
     fprintf(f, "%s", WIGLE_HEADER);
@@ -357,12 +352,23 @@ void status_led_task(void *pvParameters) {
 
 void app_main(void) {
     ESP_LOGI(TAG, "Controller starting...");
+
+    // Initialize all CS pins to HIGH early to prevent bus interference
+    gpio_config_t cs_cfg = {
+        .pin_bit_mask = (1ULL << GPIO_CS1) | (1ULL << GPIO_CS2) | (1ULL << GPIO_CS3) | (1ULL << 13),
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_ENABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE
+    };
+    gpio_config(&cs_cfg);
+    gpio_set_level(GPIO_CS1, 1);
+    gpio_set_level(GPIO_CS2, 1);
+    gpio_set_level(GPIO_CS3, 1);
+    gpio_set_level(13, 1);
     
     // Start Status LED Task
     xTaskCreate(status_led_task, "status_led_task", 2048, NULL, 5, NULL);
-
-    // Initialize SD Card
-    init_sd_card();
 
     // Initialize NVS
     esp_err_t ret = nvs_flash_init();
@@ -391,17 +397,25 @@ void app_main(void) {
     // Send assistance data to GPS module
     ubx_assist_cold_start(current_gps.latitude, current_gps.longitude);
 
-    // Start GPS Task (which now just reads from the already configured UART)
-    xTaskCreate(gps_task, "gps_task", 4096, NULL, 5, NULL);
-
-    vTaskDelay(pdMS_TO_TICKS(1000));
-    for(int i=0; i<3; i++) worker_current_channels[i] = popular_channels[i];
-
     spi_bus_config_t buscfg = {
         .miso_io_num = GPIO_MISO, .mosi_io_num = GPIO_MOSI, .sclk_io_num = GPIO_SCLK,
         .max_transfer_sz = PAYLOAD_SIZE + 100
     };
     ESP_ERROR_CHECK(spi_bus_initialize(HSPI_HOST, &buscfg, SPI_DMA_CH_AUTO));
+
+    // Enable internal pull-ups for the SPI bus
+    gpio_set_pull_mode(GPIO_MISO, GPIO_PULLUP_ONLY);
+    gpio_set_pull_mode(GPIO_MOSI, GPIO_PULLUP_ONLY);
+    gpio_set_pull_mode(GPIO_SCLK, GPIO_PULLUP_ONLY);
+
+    // Initialize SD Card IMMEDIATELY after SPI bus is ready (must be first communication)
+    init_sd_card();
+
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    for(int i=0; i<3; i++) worker_current_channels[i] = popular_channels[i];
+
+    // Start GPS Task (after SD card is initialized so it can create logs)
+    xTaskCreate(gps_task, "gps_task", 4096, NULL, 5, NULL);
 
     int cs_pins[3] = {GPIO_CS1, GPIO_CS2, GPIO_CS3};
     for (int i = 0; i < 3; i++) {
