@@ -113,13 +113,13 @@ void init_sd_card() {
     // Host configuration
     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
     host.slot = HSPI_HOST; // Use the same host as workers
-    host.max_freq_khz = 1000; // Lower to 1MHz for stability
+    host.max_freq_khz = 1000; // 1MHz stability limit
 
     // Device configuration
     sdspi_device_config_t dev_config = SDSPI_DEVICE_CONFIG_DEFAULT();
     dev_config.gpio_cs = 13; // User specified CS pin
     dev_config.host_id = HSPI_HOST; // Explicitly set host ID
-    
+
     esp_err_t ret = esp_vfs_fat_sdspi_mount(MOUNT_POINT, &host, &dev_config, &mount_config, &card);
 
     if (ret != ESP_OK) {
@@ -258,8 +258,26 @@ void create_wigle_log(const char* date, const char* time) {
     strncpy(clean_time, time, 6);
     clean_time[6] = '\0';
 
-    // Use a unique 8.3 compliant filename: HHMMSS.csv (6 characters + .csv)
-    snprintf(current_log_filename, sizeof(current_log_filename), "%s/%s.csv", MOUNT_POINT, clean_time);
+    // Reformat date from DDMMYY to YYYYMMDD
+    char formatted_date[9];
+    if (strlen(date) == 6) {
+        // GPS date is DDMMYY
+        formatted_date[0] = '2'; // Assume 20xx
+        formatted_date[1] = '0';
+        formatted_date[2] = date[4]; // Y
+        formatted_date[3] = date[5]; // Y
+        formatted_date[4] = date[2]; // M
+        formatted_date[5] = date[3]; // M
+        formatted_date[6] = date[0]; // D
+        formatted_date[7] = date[1]; // D
+        formatted_date[8] = '\0';
+    } else {
+        strncpy(formatted_date, date, 8);
+        formatted_date[8] = '\0';
+    }
+
+    // Use the descriptive filename: YYYYMMDD_HHMMSS.csv
+    snprintf(current_log_filename, sizeof(current_log_filename), "%s/%s_%s.csv", MOUNT_POINT, formatted_date, clean_time);
     ESP_LOGI(TAG, "Creating new log file: %s", current_log_filename);
 
     FILE *f = fopen(current_log_filename, "w");
