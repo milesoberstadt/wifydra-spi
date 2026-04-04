@@ -15,12 +15,12 @@ This document outlines the architecture, hardware connections, and implementatio
 All devices share a common **GND**.
 
 ### SPI Bus Connections (Common)
-| Signal | ESP32 (Controller) | ESP32-S3 (Worker x) |
-| :--- | :--- | :--- |
-| **SCLK** | GPIO 18 | GPIO 7 |
-| **MISO** | GPIO 19 | GPIO 8 |
-| **MOSI** | GPIO 23 | GPIO 9 |
-| **GND** | GND | GND |
+| Signal | ESP32 (Controller) | ESP32-S3 (Worker x) | SD Card (SPI Mode) |
+| :--- | :--- | :--- | :--- |
+| **SCLK** | GPIO 18 | GPIO 7 | SCLK |
+| **MISO** | GPIO 19 | GPIO 8 | MISO |
+| **MOSI** | GPIO 23 | GPIO 9 | MOSI |
+| **GND** | GND | GND | GND |
 
 ### Chip Select (CS) Connections (Unique)
 | Target | ESP32 (Controller CS Pin) | ESP32-S3 (Worker CS Pin) |
@@ -28,25 +28,26 @@ All devices share a common **GND**.
 | **Worker 1** | GPIO 5 | GPIO 2 |
 | **Worker 2** | GPIO 4 | GPIO 2 |
 | **Worker 3** | GPIO 32 | GPIO 2 |
+| **SD Card** | GPIO 21 | N/A |
 
-### GPS & SD Card Connections (Controller Only)
+### GPS Connections (Controller Only)
 | Peripheral | Signal | ESP32 (Controller) | Notes |
 | :--- | :--- | :--- | :--- |
 | **GPS (UART2)** | TX | GPIO 17 | Connect to GPS RX |
 | **GPS (UART2)** | RX | GPIO 16 | Connect to GPS TX |
-| **SD Card (SDMMC)**| CLK | GPIO 14 | 1-bit mode |
-| **SD Card (SDMMC)**| CMD | GPIO 15 | 1-bit mode |
-| **SD Card (SDMMC)**| D0 | GPIO 2 | 1-bit mode |
-
 
 ---
 
 ## 3. SPI Configuration Strategy
 
 - **SPI Mode:** Mode 0 (CPOL=0, CPHA=0).
-- **Clock Speed:** 1 MHz.
+- **Clock Speed:** 1 MHz (Shared between workers and SD card).
 - **DMA:** Enabled on both sides for 5100-byte payloads.
 - **Transaction:** Fixed-frame single transaction model for atomic command/response.
+- **Robustness:** 
+    - Initialized all CS pins HIGH early to prevent bus contention.
+    - SD card must be the first device initialized on the bus to switch to SPI mode.
+    - Internal pull-ups enabled on MISO, MOSI, and SCLK.
 
 ---
 
@@ -84,10 +85,13 @@ All devices share a common **GND**.
     - **UBX Helper:** Send `UBX-AID-INI` on boot to seed location for faster lock.
 - **Sync:** Pass live GPS and Unix time to workers via SPI.
 
-### Phase 8: Persistent Storage (SDMMC) [TODO]
-- **Mounting:** Initialize SDMMC in 1-bit mode and mount FATFS.
-- **Wigle CSV Header:** Write mandatory 2-line Wigle header on file creation.
-- **Logging:** Aggregate records from workers and flush to SD card periodically.
+### Phase 8: Persistent Storage (SDSPI) [DONE]
+- **Mounting:** Initialize SDSPI on shared bus (HSPI_HOST) with GPIO 21 CS.
+- **LFN Support:** Enabled Long File Name support in FATFS.
+- **Logging:** 
+    - Descriptive naming: `YYYYMMDD_HHMMSS.csv`.
+    - **Buffered IO:** 4KB RAM buffer to batch writes and reduce SD wear.
+    - Periodic flush after each worker polling cycle.
 
 ### Phase 9: Scaling to 11 Workers (Full 2.4GHz Spectrum) [TODO]
 - **CS Multiplexing:** 
@@ -111,17 +115,17 @@ All devices share a common **GND**.
 7. [x] Implement WiFi Beacon Sniffing and MAC tracking.
 8. [x] Implement Wigle-compatible data structures and SPI reporting.
 9. [x] Optimize for 1MHz stability with double buffering.
-
 10. [x] Implement UART2 driver for NEO-6M on Controller.
 11. [x] Implement NMEA parsing for RMC sentences.
 12. [x] Implement NVS storage for last-known GPS location.
 13. [x] Implement UBX protocol helper for assisted cold-start.
+14. [x] Transition from SDMMC to SDSPI for shared bus compatibility.
+15. [x] Implement 4KB buffered logging to extend SD card life.
+16. [x] Enable Long File Name support and YYYYMMDD filename formatting.
 
 ## 6. Upcoming Tasks
-1. [ ] Initialize SDMMC and verify SD card mounting.
-2. [ ] Implement Wigle CSV file rotation and header writing.
-3. [ ] Final integration: SPI data -> SD card.
-4. [ ] Prototype Phase 9 CS multiplexing hardware.
+1. [ ] Prototype Phase 9 CS multiplexing hardware.
+2. [ ] Evaluate SPI bus buffers for 11-worker scale.
 
 ## 7. Shopping list
 1. SDMMC compatible microsd sniffer

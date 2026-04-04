@@ -117,7 +117,7 @@ void init_sd_card() {
 
     // Device configuration
     sdspi_device_config_t dev_config = SDSPI_DEVICE_CONFIG_DEFAULT();
-    dev_config.gpio_cs = 13; // User specified CS pin
+    dev_config.gpio_cs = 21; // User specified CS pin
     dev_config.host_id = HSPI_HOST; // Explicitly set host ID
 
     esp_err_t ret = esp_vfs_fat_sdspi_mount(MOUNT_POINT, &host, &dev_config, &mount_config, &card);
@@ -246,12 +246,38 @@ void ubx_assist_cold_start(float lat, float lon) {
 // Logging State
 static char current_log_filename[64] = "";
 static bool log_file_created = false;
+#define LOG_BUFFER_SIZE 4096
+static char *log_buffer = NULL;
+static size_t log_buffer_len = 0;
 
 const char* WIGLE_HEADER = "WigleWifi-1.0,appRelease=1.0,model=ESP32-Scanner,release=1.0,device=ESP32-Scanner,display=ESP32-Scanner,board=ESP32,brand=Espressif\n"
                            "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
 
+void flush_log_buffer() {
+    if (!sd_card_ready || !log_file_created || log_buffer_len == 0) return;
+
+    FILE *f = fopen(current_log_filename, "a");
+    if (f == NULL) {
+        ESP_LOGE(TAG, "Failed to open log file for flushing! (errno: %d)", errno);
+        return;
+    }
+    
+    size_t written = fwrite(log_buffer, 1, log_buffer_len, f);
+    if (written != log_buffer_len) {
+        ESP_LOGE(TAG, "Failed to write all data to SD card!");
+    }
+    
+    fclose(f);
+    log_buffer_len = 0;
+}
+
 void create_wigle_log(const char* date, const char* time) {
     if (!sd_card_ready || log_file_created || !date || !time) return;
+
+    // Allocate buffer on first use
+    if (log_buffer == NULL) {
+        log_buffer = malloc(LOG_BUFFER_SIZE);
+    }
 
     // Sanitize time: GPS often gives "HHMMSS.SS", we only want "HHMMSS"
     char clean_time[7];
@@ -291,23 +317,23 @@ void create_wigle_log(const char* date, const char* time) {
 }
 
 void append_to_wigle_log(const wigle_record_t *rec) {
-    if (!sd_card_ready || !log_file_created || strlen(current_log_filename) == 0) return;
+    if (!sd_card_ready || !log_file_created || log_buffer == NULL) return;
 
-    FILE *f = fopen(current_log_filename, "a");
-    if (f == NULL) {
-        ESP_LOGE(TAG, "Failed to open log file for appending!");
-        return;
-    }
-
-    // Format: MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type
-    // Note: We use fixed placeholders for AuthMode, Altitude and Accuracy as we don't have them all yet
-    fprintf(f, "%02X:%02X:%02X:%02X:%02X:%02X,%s,[WPA2-PSK-CCMP][ESS],2026-03-28 00:00:00,%d,%d,%.6f,%.6f,0,0,WIFI\n",
+    char line[200];
+    int len = snprintf(line, sizeof(line), "%02X:%02X:%02X:%02X:%02X:%02X,%s,[WPA2-PSK-CCMP][ESS],2026-03-28 00:00:00,%d,%d,%.6f,%.6f,0,0,WIFI\n",
             rec->bssid[0], rec->bssid[1], rec->bssid[2],
             rec->bssid[3], rec->bssid[4], rec->bssid[5],
             rec->ssid, rec->channel, rec->rssi,
             rec->lat, rec->lon);
 
-    fclose(f);
+    if (log_buffer_len + len >= LOG_BUFFER_SIZE) {
+        flush_log_buffer();
+    }
+
+    if (len > 0 && len < sizeof(line)) {
+        memcpy(log_buffer + log_buffer_len, line, len);
+        log_buffer_len += len;
+    }
 }
 
 // $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
@@ -393,7 +419,7 @@ void app_main(void) {
 
     // Initialize all CS pins to HIGH early to prevent bus interference
     gpio_config_t cs_cfg = {
-        .pin_bit_mask = (1ULL << GPIO_CS1) | (1ULL << GPIO_CS2) | (1ULL << GPIO_CS3) | (1ULL << 13),
+        .pin_bit_mask = (1ULL << GPIO_CS1) | (1ULL << GPIO_CS2) | (1ULL << GPIO_CS3) | (1ULL << 21),
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = GPIO_PULLUP_ENABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
@@ -403,7 +429,7 @@ void app_main(void) {
     gpio_set_level(GPIO_CS1, 1);
     gpio_set_level(GPIO_CS2, 1);
     gpio_set_level(GPIO_CS3, 1);
-    gpio_set_level(13, 1);
+    gpio_set_level(21, 1);
     
     // Start Status LED Task
     xTaskCreate(status_led_task, "status_led_task", 2048, NULL, 5, NULL);
@@ -505,6 +531,7 @@ void app_main(void) {
                             }
                             append_to_wigle_log(&rec[j]);
                         }
+                        flush_log_buffer();
                     } else ESP_LOGE(TAG, "Worker %d Checksum Fail!", i+1);
                 } else ESP_LOGW(TAG, "Worker %d Handshake Fail (0x%02X)", i+1, rx->status);
             }
