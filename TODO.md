@@ -1,5 +1,3 @@
-# SPI Communication Project Plan: ESP32 Controller to 3x ESP32-S3 Workers
-
 ### Scaling to 15 Workers (6GHz PSC channels) [TODO]
 - **CS Multiplexing:** 
     - Implement a **4-to-16 Decoder** (e.g., 74HC154) or **GPIO Expander** (e.g., MCP23017) to control 15 CS lines using only 4 controller pins.
