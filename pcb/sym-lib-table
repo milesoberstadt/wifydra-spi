@@ -1,0 +1,4 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "esp32_wroom") (type "KiCad") (uri "${KIPRJMOD}/esp32_wroom.kicad_sym") (options "") (descr ""))
+)
