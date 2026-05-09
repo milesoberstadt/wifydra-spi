@@ -1,7 +1,3 @@
-# SPI Communication Project: Controller-Worker WiFi Sniffer
-
-This project establishes a high-speed, reliable SPI communication link between an ESP32 Controller and multiple ESP32-S3 Worker nodes using the ESP-IDF framework.
-
 ## Project Overview
 - **Architecture:** 1 Controller (Master) polling up to 3 Workers (Slaves).
 - **Primary Goal:** Distributed WiFi beacon sniffing and MAC address tracking in a Wigle-compatible format.
@@ -24,34 +20,6 @@ This project establishes a high-speed, reliable SPI communication link between a
 - **Filter:** Specifically targets Beacon frames (Type 0, Subtype 8).
 - **Storage:** Up to 500 unique APs tracked in internal memory.
 - **Efficiency:** Uses a "Sent" flag logic to transmit only new discoveries across the SPI bus.
-
-## Hardware Wiring (Standard)
-| Signal | Controller (ESP32) | Worker (ESP32-S3) |
-| :--- | :--- | :--- |
-| **SCLK** | GPIO 18 | GPIO 7 |
-| **MISO** | GPIO 19 | GPIO 8 |
-| **MOSI** | GPIO 23 | GPIO 9 |
-| **CS (Worker 1)** | GPIO 5 | GPIO 2 |
-| **CS (Worker 2)** | GPIO 4 | GPIO 2 |
-| **CS (Worker 3)** | GPIO 16 | GPIO 2 |
-
-## Building and Running
-### Prerequisites
-- ESP-IDF 5.x environment sourced: `. $IDF_PATH/export.sh`
-
-### Commands
-- **Controller:**
-  ```bash
-  cd controller
-  idf.py build
-  idf.py -p /dev/ttyUSB0 flash monitor
-  ```
-- **Worker:**
-  ```bash
-  cd worker
-  idf.py build
-  idf.py -p /dev/ttyACM0 flash  # or /dev/ttyACM1
-  ```
 
 ## Development Conventions
 - **Memory Allocation:** SPI buffers **must** use `heap_caps_calloc(..., MALLOC_CAP_DMA)` for hardware compatibility.

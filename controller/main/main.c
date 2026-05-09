@@ -87,7 +87,11 @@ typedef struct __attribute__((packed)) {
     uint8_t sent;
 } wigle_record_t;
 
-static const uint8_t popular_channels[] = {1, 6, 11, 2, 7, 12, 3, 8, 13, 4, 9, 5, 10, 14};
+static const uint8_t popular_channels[] = {1, 6, 11, 2, 7, 3, 8, 4, 9, 5, 10};
+// 5 GHz non-DFS channels
+// static const uint8_t popular_channels[] = {36, 40, 44, 48, 149, 153, 157, 161, 165};
+// 6 GHz PSC channels
+// static const uint8_t popular_channels[] = {5,21,37,53,69,85,101,117,133,149,165,181,197,213,229};
 static uint8_t worker_current_channels[3]; 
 
 // NMEA Parsing State
