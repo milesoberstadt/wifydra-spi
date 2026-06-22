@@ -20,13 +20,16 @@ static const char *TAG = "CONTROLLER";
 #define CONFIG_WAIT_FOR_GPS_FIX true  // If true, controller won't poll workers until GPS has a fix
 // ---------------------
 
-#define GPIO_SCLK 18
-#define GPIO_MISO 19
-#define GPIO_MOSI 23
-#define GPIO_CS1   5
-#define GPIO_CS2   4
-#define GPIO_CS3  32
-#define GPIO_LED  27
+#define GPIO_SCLK 12
+#define GPIO_MISO 13
+#define GPIO_MOSI 11
+#define GPIO_LED  47
+#define SD_CS_PIN 10
+#define NUM_WORKERS 16
+
+static const int cs_pins[NUM_WORKERS] = {
+    4, 5, 6, 7, 15, 18, 8, 9, 2, 42, 41, 40, 39, 21, 10, 14
+};
 
 // GPS UART Config
 #define GPS_UART_NUM UART_NUM_2
@@ -43,7 +46,7 @@ static const char *TAG = "CONTROLLER";
 #define NVS_KEY_LAT "last_lat"
 #define NVS_KEY_LON "last_lon"
 
-spi_device_handle_t workers[3];
+spi_device_handle_t workers[NUM_WORKERS];
 
 typedef struct __attribute__((packed)) {
     float latitude;
@@ -92,7 +95,7 @@ static const uint8_t popular_channels[] = {1, 6, 11, 2, 7, 3, 8, 4, 9, 5, 10};
 // static const uint8_t popular_channels[] = {36, 40, 44, 48, 149, 153, 157, 161, 165};
 // 6 GHz PSC channels
 // static const uint8_t popular_channels[] = {5,21,37,53,69,85,101,117,133,149,165,181,197,213,229};
-static uint8_t worker_current_channels[3]; 
+static uint8_t worker_current_channels[NUM_WORKERS]; 
 
 // NMEA Parsing State
 static bool gps_data_seen = false;
@@ -121,7 +124,7 @@ void init_sd_card() {
 
     // Device configuration
     sdspi_device_config_t dev_config = SDSPI_DEVICE_CONFIG_DEFAULT();
-    dev_config.gpio_cs = 21; // User specified CS pin
+    dev_config.gpio_cs = SD_CS_PIN; // User specified CS pin
     dev_config.host_id = HSPI_HOST; // Explicitly set host ID
 
     esp_err_t ret = esp_vfs_fat_sdspi_mount(MOUNT_POINT, &host, &dev_config, &mount_config, &card);
@@ -422,18 +425,22 @@ void app_main(void) {
     ESP_LOGI(TAG, "Controller starting...");
 
     // Initialize all CS pins to HIGH early to prevent bus interference
+    uint64_t pin_mask = (1ULL << SD_CS_PIN);
+    for (int i = 0; i < NUM_WORKERS; i++) {
+        pin_mask |= (1ULL << cs_pins[i]);
+    }
     gpio_config_t cs_cfg = {
-        .pin_bit_mask = (1ULL << GPIO_CS1) | (1ULL << GPIO_CS2) | (1ULL << GPIO_CS3) | (1ULL << 21),
+        .pin_bit_mask = pin_mask,
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = GPIO_PULLUP_ENABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type = GPIO_INTR_DISABLE
     };
     gpio_config(&cs_cfg);
-    gpio_set_level(GPIO_CS1, 1);
-    gpio_set_level(GPIO_CS2, 1);
-    gpio_set_level(GPIO_CS3, 1);
-    gpio_set_level(21, 1);
+    for (int i = 0; i < NUM_WORKERS; i++) {
+        gpio_set_level(cs_pins[i], 1);
+    }
+    gpio_set_level(SD_CS_PIN, 1);
     
     // Start Status LED Task
     xTaskCreate(status_led_task, "status_led_task", 2048, NULL, 5, NULL);
@@ -480,13 +487,14 @@ void app_main(void) {
     init_sd_card();
 
     vTaskDelay(pdMS_TO_TICKS(1000));
-    for(int i=0; i<3; i++) worker_current_channels[i] = popular_channels[i];
+    for (int i = 0; i < NUM_WORKERS; i++) {
+        worker_current_channels[i] = popular_channels[i % (sizeof(popular_channels) / sizeof(popular_channels[0]))];
+    }
 
     // Start GPS Task (after SD card is initialized so it can create logs)
     xTaskCreate(gps_task, "gps_task", 4096, NULL, 5, NULL);
 
-    int cs_pins[3] = {GPIO_CS1, GPIO_CS2, GPIO_CS3};
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < NUM_WORKERS; i++) {
         spi_device_interface_config_t devcfg = {
             .clock_speed_hz = 1 * 1000 * 1000, 
             .mode = 0,
@@ -511,7 +519,7 @@ void app_main(void) {
     }
 
     while (1) {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < NUM_WORKERS; i++) {
             ESP_LOGI(TAG, "Polling Worker %d...", i + 1);
             memset(tx, 0, sizeof(controller_msg_t));
             tx->command = HANDSHAKE_CMD;
