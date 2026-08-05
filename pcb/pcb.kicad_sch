@@ -6735,6 +6735,16 @@
 		)
 		(uuid "018cd91d-bd17-43ac-9e80-9b1b8d30586e")
 	)
+	(label "CS 5"
+		(at 21.59 203.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "04d7a93d-a10a-4225-b9ed-4e0b402373c4")
+	)
 	(label "MOSI"
 		(at 76.2 34.29 0)
 		(effects
@@ -6744,6 +6754,16 @@
 			(justify left bottom)
 		)
 		(uuid "0a7a68b2-8523-428e-8db5-21357c35d8c9")
+	)
+	(label "CS 16"
+		(at 180.34 328.93 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0d717690-5d03-446e-9252-0e80259bede2")
 	)
 	(label "MISO"
 		(at 234.95 161.29 0)
@@ -6755,6 +6775,16 @@
 		)
 		(uuid "0f598226-2a1c-4fb6-9792-be206054aa30")
 	)
+	(label "CS 6"
+		(at 21.59 243.84 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "101c2438-db4f-4f01-b084-0a32af2d68a3")
+	)
 	(label "SCK"
 		(at 139.7 201.93 0)
 		(effects
@@ -6764,6 +6794,16 @@
 			(justify left bottom)
 		)
 		(uuid "1307c42a-6854-4ca4-9370-651641a032db")
+	)
+	(label "CS 4"
+		(at 21.59 163.83 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "155578c2-d94d-4b44-b9a6-bc2cb4ff9b08")
 	)
 	(label "SCK"
 		(at 234.95 245.11 0)
@@ -6805,6 +6845,16 @@
 		)
 		(uuid "251bff9f-ad47-4726-8c6a-6b926349e0e5")
 	)
+	(label "CS 3"
+		(at 21.59 123.19 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "291eb80f-113d-454c-83d0-2c926be9ab5e")
+	)
 	(label "MOSI"
 		(at 234.95 34.29 0)
 		(effects
@@ -6814,6 +6864,16 @@
 			(justify left bottom)
 		)
 		(uuid "2b4f7d76-2d55-4001-abce-32390ead67f6")
+	)
+	(label "CS 8"
+		(at 21.59 328.93 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "33c44c2a-f8d0-4ef3-8a2b-e640ea277932")
 	)
 	(label "MISO"
 		(at 234.95 241.3 0)
@@ -6874,6 +6934,16 @@
 			(justify left bottom)
 		)
 		(uuid "4e4623c7-f359-450e-b1e6-d9b5eef2daa6")
+	)
+	(label "CS 11"
+		(at 180.34 123.19 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "52c5b114-6bf7-46ca-8d34-b0f75142dab5")
 	)
 	(label "MOSI"
 		(at 76.2 116.84 0)
@@ -6945,6 +7015,16 @@
 		)
 		(uuid "63e940f4-d6c1-4516-95e1-547810984d33")
 	)
+	(label "CS 10"
+		(at 180.34 80.01 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6830655f-c9e5-4666-ab49-130afa82e1ea")
+	)
 	(label "SCK"
 		(at 234.95 41.91 0)
 		(effects
@@ -7015,6 +7095,16 @@
 		)
 		(uuid "7e332e1f-e7e3-43a6-bf6e-1253ea548c70")
 	)
+	(label "CS 15"
+		(at 181.61 287.02 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "83ef1579-9c3f-474b-99bd-7cc8a7cd49c5")
+	)
 	(label "MOSI"
 		(at 234.95 237.49 0)
 		(effects
@@ -7074,6 +7164,16 @@
 			(justify left bottom)
 		)
 		(uuid "9d885233-0285-4ac2-bb5f-b79b8ad28c6d")
+	)
+	(label "CS 12"
+		(at 180.34 163.83 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a594961c-e237-4da6-8cd8-b49701b5bf80")
 	)
 	(label "GPS_RX"
 		(at 111.76 316.23 0)
@@ -7145,6 +7245,16 @@
 		)
 		(uuid "bb1abd30-6b62-4147-a86c-751fd35db235")
 	)
+	(label "MicroSD Card Breakout"
+		(at 123.19 194.31 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "bd2b6301-eadd-4251-a97b-81f39c3e535b")
+	)
 	(label "SCK"
 		(at 114.3 339.09 0)
 		(effects
@@ -7195,6 +7305,16 @@
 		)
 		(uuid "cac9c79a-8fd2-48e5-865c-944e943805a9")
 	)
+	(label "CS 2"
+		(at 21.59 78.74 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cd305c16-e287-45bd-9eed-6ca4ea764206")
+	)
 	(label "SCK"
 		(at 234.95 204.47 0)
 		(effects
@@ -7204,6 +7324,16 @@
 			(justify left bottom)
 		)
 		(uuid "cd79e839-6ef6-4ca4-b1c1-9642c1143200")
+	)
+	(label "CS 13"
+		(at 180.34 203.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d14289b2-5b50-4174-b342-d58b89a31e45")
 	)
 	(label "MISO"
 		(at 236.22 284.48 0)
@@ -7235,6 +7365,26 @@
 		)
 		(uuid "de4629ee-5377-4512-89fc-0817624aacdc")
 	)
+	(label "CS 7"
+		(at 22.86 287.02 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e40fdcc4-fd92-4dbf-a9ce-8367e7e3d42a")
+	)
+	(label "CS 9"
+		(at 180.34 41.91 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e967438d-1e42-40e3-94c9-1157c3f0f454")
+	)
 	(label "SCK"
 		(at 76.2 245.11 0)
 		(effects
@@ -7254,6 +7404,16 @@
 			(justify left bottom)
 		)
 		(uuid "ebc5ec77-0e17-418f-9b6e-61f7c7c9a63a")
+	)
+	(label "CS 1"
+		(at 21.59 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "eceaed8e-6409-49e2-b522-c5814e20349d")
 	)
 	(label "SCK"
 		(at 76.2 204.47 0)
@@ -7284,6 +7444,16 @@
 			(justify left bottom)
 		)
 		(uuid "f6a5b7d6-d249-4c3c-a874-e64c877b9820")
+	)
+	(label "CS 14"
+		(at 180.34 243.84 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f8608082-b3d4-48b4-bad3-e48ebecf28f2")
 	)
 	(label "MISO"
 		(at 234.95 120.65 0)
@@ -7983,7 +8153,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "2223d586-5396-45f8-a217-be9022bd6f67")
-		(property "Reference" "U19"
+		(property "Reference" "U18"
 			(at 132.08 218.44 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8048,7 +8218,7 @@
 		(instances
 			(project "pcb"
 				(path "/177b52ef-cce2-4dab-a936-75649664352c"
-					(reference "U19")
+					(reference "U18")
 					(unit 1)
 				)
 			)
@@ -9445,7 +9615,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "4d68212b-28ce-4f25-a08f-1f02862b4822")
-		(property "Reference" "U15"
+		(property "Reference" "U16"
 			(at 208.28 302.26 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9543,7 +9713,7 @@
 		(instances
 			(project "pcb"
 				(path "/177b52ef-cce2-4dab-a936-75649664352c"
-					(reference "U15")
+					(reference "U16")
 					(unit 1)
 				)
 			)
@@ -10159,10 +10329,9 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "68ea6bfa-2130-485f-b11a-8c53ca2e76b1")
-		(property "Reference" "U16"
-			(at 133.35 290.83 0)
+		(property "Reference" "U17"
+			(at 132.334 286.766 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -10171,8 +10340,8 @@
 				)
 			)
 		)
-		(property "Value" ""
-			(at 121.92 293.37 0)
+		(property "Value" "ESP32-S3 DevKitC-A"
+			(at 132.588 291.084 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -10349,7 +10518,7 @@
 		(instances
 			(project "pcb"
 				(path "/177b52ef-cce2-4dab-a936-75649664352c"
-					(reference "U16")
+					(reference "U17")
 					(unit 1)
 				)
 			)
@@ -11757,7 +11926,7 @@
 		(dnp no)
 		(uuid "b00f67b1-4af5-4b3a-9274-ad1cbfd3cf30")
 		(property "Reference" "J2"
-			(at 119.888 195.58 0)
+			(at 132.08 190.754 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -11767,7 +11936,7 @@
 			)
 		)
 		(property "Value" "Conn_01x06_Pin"
-			(at 132.715 196.85 0)
+			(at 132.08 196.342 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -12980,7 +13149,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ccef04c1-307e-47b2-8ed9-efa9693fe80c")
-		(property "Reference" "U18"
+		(property "Reference" "U15"
 			(at 209.55 260.35 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -13078,7 +13247,7 @@
 		(instances
 			(project "pcb"
 				(path "/177b52ef-cce2-4dab-a936-75649664352c"
-					(reference "U18")
+					(reference "U15")
 					(unit 1)
 				)
 			)
