@@ -619,276 +619,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:Battery"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "BT"
-				(at 2.54 2.54 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Value" "Battery"
-				(at 2.54 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 1.524 90)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 1.524 90)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Multiple-cell battery"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Sim.Device" "V"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Sim.Type" "DC"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Sim.Pins" "1=+ 2=-"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "batt voltage-source cell"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "Battery_0_1"
-				(rectangle
-					(start -2.286 1.778)
-					(end 2.286 1.524)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(rectangle
-					(start -2.286 -1.27)
-					(end 2.286 -1.524)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(rectangle
-					(start -1.524 1.016)
-					(end 1.524 0.508)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(rectangle
-					(start -1.524 -2.032)
-					(end 1.524 -2.54)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 1.778) (xy 0 2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 0) (xy 0 0.254)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 -0.508) (xy 0 -0.254)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 -1.016) (xy 0 -0.762)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.762 3.048) (xy 1.778 3.048)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.27 3.556) (xy 1.27 2.54)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "Battery_1_1"
-				(pin passive line
-					(at 0 5.08 270)
-					(length 2.54)
-					(name "+"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -5.08 90)
-					(length 2.54)
-					(name "-"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Device:C"
 			(pin_numbers
 				(hide yes)
@@ -1668,6 +1398,276 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "esp32_wroom:Battery_-_POWER_OUTPUT"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "BT1"
+				(at 3.81 1.8416 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "Battery_-_POWER_OUTPUT"
+				(at 3.81 -0.6984 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
+				(at 0 1.524 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 1.524 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Multiple-cell battery"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Device" "V"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Type" "DC"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Pins" "1=+ 2=-"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "batt voltage-source cell"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Battery_-_POWER_OUTPUT_0_1"
+				(rectangle
+					(start -2.286 1.778)
+					(end 2.286 1.524)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(rectangle
+					(start -2.286 -1.27)
+					(end 2.286 -1.524)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(rectangle
+					(start -1.524 1.016)
+					(end 1.524 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(rectangle
+					(start -1.524 -2.032)
+					(end 1.524 -2.54)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 1.778) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 0.254)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -0.508) (xy 0 -0.254)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -1.016) (xy 0 -0.762)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 3.048) (xy 1.778 3.048)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 3.556) (xy 1.27 2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Battery_-_POWER_OUTPUT_1_1"
+				(pin power_out line
+					(at 0 5.08 270)
+					(length 2.54)
+					(name "+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 0 -5.08 90)
+					(length 2.54)
+					(name "-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "esp32_wroom:esp32-s3-devkitc-1"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -1694,7 +1694,7 @@
 					)
 				)
 			)
-			(property "Footprint" ""
+			(property "Footprint" "PCM_Espressif:ESP32-S3-DevKitC"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -2791,121 +2791,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "power:PWR_FLAG"
-			(power global)
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "#FLG"
-				(at 0 1.905 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "PWR_FLAG"
-				(at 0 3.81 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Special symbol for telling ERC where power comes from"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "flag power"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "PWR_FLAG_0_0"
-				(pin power_out line
-					(at 0 0 90)
-					(length 0)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(symbol "PWR_FLAG_0_1"
-				(polyline
-					(pts
-						(xy 0 0) (xy 0 1.27) (xy -1.016 1.905) (xy 0 2.54) (xy 1.016 1.905) (xy 0 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 	)
 	(text "TX"
 		(exclude_from_sim no)
@@ -3056,22 +2941,16 @@
 		(uuid "5a831d08-ed3c-4f71-8b74-17eb32ac2505")
 	)
 	(junction
-		(at 142.24 35.56)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "5cbc0f6d-e9f4-4395-a0bf-fb106069ecb0")
-	)
-	(junction
-		(at 130.81 26.67)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "636ae84f-ce7a-4c46-9dcc-b67f0dc615e5")
-	)
-	(junction
 		(at 180.34 130.81)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "71871a93-9cd7-487f-92fa-c392568bf1e3")
+	)
+	(junction
+		(at 132.08 236.22)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "83d9b92f-03b3-49ae-a4ba-e957e19c7e49")
 	)
 	(junction
 		(at 87.63 337.82)
@@ -3102,6 +2981,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b754830c-7888-4f1c-a765-fad2ed213a60")
+	)
+	(junction
+		(at 116.84 232.41)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "d31357ed-fe07-4fa5-8280-67f710b6a813")
 	)
 	(junction
 		(at 87.63 252.73)
@@ -3727,7 +3612,7 @@
 	)
 	(wire
 		(pts
-			(xy 130.81 26.67) (xy 142.24 26.67)
+			(xy 128.27 26.67) (xy 142.24 26.67)
 		)
 		(stroke
 			(width 0)
@@ -3757,16 +3642,6 @@
 	)
 	(wire
 		(pts
-			(xy 113.03 215.9) (xy 113.03 243.84)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0866ffcb-db22-4135-9db2-360859148233")
-	)
-	(wire
-		(pts
 			(xy 21.59 113.03) (xy 21.59 133.35)
 		)
 		(stroke
@@ -3774,16 +3649,6 @@
 			(type default)
 		)
 		(uuid "0917762c-7f23-4377-bfd4-0f540f3a7c9a")
-	)
-	(wire
-		(pts
-			(xy 116.84 238.76) (xy 116.84 232.41)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0978ab60-462f-4ef5-8ac5-2684c2872eb9")
 	)
 	(wire
 		(pts
@@ -3927,7 +3792,7 @@
 	)
 	(wire
 		(pts
-			(xy 142.24 36.83) (xy 142.24 35.56)
+			(xy 142.24 36.83) (xy 142.24 39.37)
 		)
 		(stroke
 			(width 0)
@@ -4097,6 +3962,16 @@
 	)
 	(wire
 		(pts
+			(xy 132.08 236.22) (xy 124.46 236.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2039537c-44fa-49f2-a1a3-92728e0dc82d")
+	)
+	(wire
+		(pts
 			(xy 87.63 50.8) (xy 87.63 48.26)
 		)
 		(stroke
@@ -4214,16 +4089,6 @@
 			(type default)
 		)
 		(uuid "2a067a05-9eb0-47d1-ad27-486f7617a3f1")
-	)
-	(wire
-		(pts
-			(xy 157.48 35.56) (xy 157.48 43.18)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2a23144d-6327-49db-af27-11e5c9e45d4a")
 	)
 	(wire
 		(pts
@@ -4394,16 +4259,6 @@
 			(type default)
 		)
 		(uuid "3b7be81e-51a6-4ce9-bee9-7ffa0fba443d")
-	)
-	(wire
-		(pts
-			(xy 128.27 26.67) (xy 130.81 26.67)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3c2e8bc1-4537-4f66-9bdf-3bdb3dc0c1f0")
 	)
 	(wire
 		(pts
@@ -4677,16 +4532,6 @@
 	)
 	(wire
 		(pts
-			(xy 116.84 224.79) (xy 124.46 224.79)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5173ed8e-3ecd-4166-a25f-151f1ac8dbd5")
-	)
-	(wire
-		(pts
 			(xy 76.2 157.48) (xy 73.66 157.48)
 		)
 		(stroke
@@ -4774,6 +4619,16 @@
 			(type default)
 		)
 		(uuid "5a90cc18-c985-48f5-a5a5-b7f5dd41c7b8")
+	)
+	(wire
+		(pts
+			(xy 116.84 224.79) (xy 124.46 224.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5b6683f5-760b-41e4-88c7-1b72b6ae835c")
 	)
 	(wire
 		(pts
@@ -4887,16 +4742,6 @@
 	)
 	(wire
 		(pts
-			(xy 157.48 43.18) (xy 149.86 43.18)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "64085f64-16a3-43a8-afdc-c2abec8f2822")
-	)
-	(wire
-		(pts
 			(xy 153.67 199.39) (xy 137.16 199.39)
 		)
 		(stroke
@@ -4914,6 +4759,16 @@
 			(type default)
 		)
 		(uuid "65aacd8e-6bce-4875-be01-6c0ab5079231")
+	)
+	(wire
+		(pts
+			(xy 116.84 224.79) (xy 116.84 232.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "66062fcf-819f-4288-ad68-a59caea60198")
 	)
 	(wire
 		(pts
@@ -5447,6 +5302,16 @@
 	)
 	(wire
 		(pts
+			(xy 116.84 232.41) (xy 116.84 240.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "94d0664d-8102-45ec-a6a1-9538a0933977")
+	)
+	(wire
+		(pts
 			(xy 82.55 323.85) (xy 87.63 323.85)
 		)
 		(stroke
@@ -5454,6 +5319,16 @@
 			(type default)
 		)
 		(uuid "95a5e04c-1a47-46ca-9155-7f161e7071f2")
+	)
+	(wire
+		(pts
+			(xy 124.46 236.22) (xy 124.46 232.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "95d5cbe4-44f6-41e1-8fbb-0ec16c5a917c")
 	)
 	(wire
 		(pts
@@ -5887,16 +5762,6 @@
 	)
 	(wire
 		(pts
-			(xy 130.81 20.32) (xy 130.81 26.67)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "bd491952-e551-443c-b9a1-71240de70edb")
-	)
-	(wire
-		(pts
 			(xy 232.41 66.04) (xy 246.38 66.04)
 		)
 		(stroke
@@ -6187,6 +6052,16 @@
 	)
 	(wire
 		(pts
+			(xy 113.03 215.9) (xy 113.03 243.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d5beebc8-3fb4-49fd-b4a3-211cc6299dfc")
+	)
+	(wire
+		(pts
 			(xy 99.06 321.31) (xy 119.38 321.31)
 		)
 		(stroke
@@ -6427,7 +6302,7 @@
 	)
 	(wire
 		(pts
-			(xy 119.38 238.76) (xy 116.84 238.76)
+			(xy 116.84 240.03) (xy 119.38 240.03)
 		)
 		(stroke
 			(width 0)
@@ -6684,16 +6559,6 @@
 			(type default)
 		)
 		(uuid "fe6d12f0-905b-4cf1-bd52-193cbada3ee8")
-	)
-	(wire
-		(pts
-			(xy 142.24 35.56) (xy 157.48 35.56)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ff531925-83ba-421a-8f75-c8e01f0e12ed")
 	)
 	(wire
 		(pts
@@ -7244,16 +7109,6 @@
 			(justify left bottom)
 		)
 		(uuid "bb1abd30-6b62-4147-a86c-751fd35db235")
-	)
-	(label "MicroSD Card Breakout"
-		(at 123.19 194.31 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "bd2b6301-eadd-4251-a97b-81f39c3e535b")
 	)
 	(label "SCK"
 		(at 114.3 339.09 0)
@@ -8234,7 +8089,6 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "2263cb07-2237-4d9c-841a-64901c63e1f8")
 		(property "Reference" "J1"
 			(at 126.365 125.73 0)
@@ -8246,8 +8100,8 @@
 				)
 			)
 		)
-		(property "Value" "Conn_01x04_Pin"
-			(at 126.365 128.27 0)
+		(property "Value" "GPS Module Breakout"
+			(at 129.286 128.27 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -8509,7 +8363,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:Battery")
+		(lib_id "esp32_wroom:Battery_-_POWER_OUTPUT")
 		(at 128.27 31.75 0)
 		(unit 1)
 		(body_style 1)
@@ -8856,84 +8710,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 119.38 238.76 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "3726aec5-8dc1-4423-bb07-8afa61c7cab9")
-		(property "Reference" "#PWR07"
-			(at 119.38 242.57 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "+5V"
-			(at 119.38 233.68 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 119.38 238.76 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 119.38 238.76 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 119.38 238.76 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "8049b2e3-4251-4a1a-835a-5f0b260b1a21")
-		)
-		(instances
-			(project "pcb"
-				(path "/177b52ef-cce2-4dab-a936-75649664352c"
-					(reference "#PWR07")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 153.67 228.6 0)
 		(unit 1)
@@ -9010,84 +8786,6 @@
 			(project "pcb"
 				(path "/177b52ef-cce2-4dab-a936-75649664352c"
 					(reference "R1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:PWR_FLAG")
-		(at 130.81 20.32 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "383dc929-a8e8-45d7-a5cb-6f7d43ed5232")
-		(property "Reference" "#FLG01"
-			(at 130.81 18.415 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "PWR_FLAG"
-			(at 130.81 15.24 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 130.81 20.32 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 130.81 20.32 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Special symbol for telling ERC where power comes from"
-			(at 130.81 20.32 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "ed848d6e-4aae-4cb1-9fcd-506b90fa8f61")
-		)
-		(instances
-			(project "pcb"
-				(path "/177b52ef-cce2-4dab-a936-75649664352c"
-					(reference "#FLG01")
 					(unit 1)
 				)
 			)
@@ -10161,7 +9859,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 142.24 35.56 0)
+		(at 142.24 39.37 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -10172,7 +9870,7 @@
 		(fields_autoplaced yes)
 		(uuid "5e386133-53d5-4b2b-be22-00d44877b51b")
 		(property "Reference" "#PWR04"
-			(at 142.24 41.91 0)
+			(at 142.24 45.72 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10183,7 +9881,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 142.24 40.64 0)
+			(at 142.24 44.45 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -10193,7 +9891,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 142.24 35.56 0)
+			(at 142.24 39.37 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10204,7 +9902,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 142.24 35.56 0)
+			(at 142.24 39.37 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10215,7 +9913,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 142.24 35.56 0)
+			(at 142.24 39.37 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10340,7 +10038,7 @@
 				)
 			)
 		)
-		(property "Value" "ESP32-S3 DevKitC-A"
+		(property "Value" "ESP32-S3 DevKitC-1"
 			(at 132.588 291.084 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10604,7 +10302,7 @@
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 116.84 228.6 0)
+		(at 120.65 232.41 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -10612,32 +10310,29 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "738afb1a-cc4b-43e3-a4e3-b28d2b7a77c2")
 		(property "Reference" "C1"
-			(at 120.65 227.3299 0)
+			(at 120.65 226.822 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
 		(property "Value" "100nF"
-			(at 120.65 229.8699 0)
+			(at 120.65 229.108 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm"
-			(at 117.8052 232.41 0)
+			(at 116.84 233.3752 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10648,7 +10343,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 116.84 228.6 0)
+			(at 120.65 232.41 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10659,7 +10354,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 116.84 228.6 0)
+			(at 120.65 232.41 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -11926,7 +11621,7 @@
 		(dnp no)
 		(uuid "b00f67b1-4af5-4b3a-9274-ad1cbfd3cf30")
 		(property "Reference" "J2"
-			(at 132.08 190.754 0)
+			(at 128.27 194.056 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -11935,7 +11630,7 @@
 				)
 			)
 		)
-		(property "Value" "Conn_01x06_Pin"
+		(property "Value" "MicroSD Card Breakout"
 			(at 132.08 196.342 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12279,7 +11974,7 @@
 	)
 	(symbol
 		(lib_id "power:+5V")
-		(at 110.49 346.71 0)
+		(at 110.49 346.71 180)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -12287,10 +11982,9 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "b976290c-6649-46da-b9ea-647433c27b55")
 		(property "Reference" "#PWR024"
-			(at 110.49 350.52 0)
+			(at 110.49 342.9 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12301,13 +11995,14 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 110.49 341.63 0)
+			(at 108.712 351.028 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify right)
 			)
 		)
 		(property "Footprint" ""
@@ -14154,84 +13849,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:PWR_FLAG")
-		(at 149.86 43.18 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "f22c52e9-7f64-42f7-bd59-3aab31810f29")
-		(property "Reference" "#FLG02"
-			(at 149.86 41.275 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "PWR_FLAG"
-			(at 149.86 38.1 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 149.86 43.18 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 149.86 43.18 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Special symbol for telling ERC where power comes from"
-			(at 149.86 43.18 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "8e124a12-992e-4624-ace4-b33321eaf719")
-		)
-		(instances
-			(project "pcb"
-				(path "/177b52ef-cce2-4dab-a936-75649664352c"
-					(reference "#FLG02")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 246.38 242.57 0)
 		(unit 1)
@@ -14546,6 +14163,83 @@
 			(project "pcb"
 				(path "/177b52ef-cce2-4dab-a936-75649664352c"
 					(reference "#PWR06")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 119.38 240.03 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "f90e0cb8-a0ca-4919-b8de-975cdfe19f32")
+		(property "Reference" "#PWR042"
+			(at 119.38 243.84 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+5V"
+			(at 119.126 236.474 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 119.38 240.03 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 119.38 240.03 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5V\""
+			(at 119.38 240.03 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "bebc3277-f7f6-493d-bcf8-f97730b8d2a2")
+		)
+		(instances
+			(project "pcb"
+				(path "/177b52ef-cce2-4dab-a936-75649664352c"
+					(reference "#PWR042")
 					(unit 1)
 				)
 			)

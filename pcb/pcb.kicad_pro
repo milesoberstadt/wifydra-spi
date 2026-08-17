@@ -511,6 +511,64 @@
         "via_diameter": 0.6,
         "via_drill": 0.3,
         "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "line_style": 0,
+        "name": "5V",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 5,
+        "schematic_color": "rgb(255, 12, 9)",
+        "tuning_profile": "",
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "line_style": 0,
+        "name": "CS",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 3,
+        "schematic_color": "rgb(255, 206, 0)",
+        "tuning_profile": "",
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "line_style": 0,
+        "name": "Ground",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 4,
+        "schematic_color": "rgb(0, 0, 0)",
+        "tuning_profile": "",
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "line_style": 0,
+        "name": "MISO",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 1,
+        "schematic_color": "rgb(145, 0, 255)",
+        "tuning_profile": ""
+      },
+      {
+        "bus_width": 12,
+        "line_style": 0,
+        "name": "MOSI",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 2,
+        "schematic_color": "rgb(9, 2, 255)",
+        "tuning_profile": "",
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "line_style": 0,
+        "name": "SCLK",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 0,
+        "schematic_color": "rgb(50, 255, 42)",
+        "tuning_profile": ""
       }
     ],
     "meta": {
@@ -518,7 +576,92 @@
     },
     "net_colors": null,
     "netclass_assignments": null,
-    "netclass_patterns": []
+    "netclass_patterns": [
+      {
+        "netclass": "5V",
+        "pattern": "+5V"
+      },
+      {
+        "netclass": "Ground",
+        "pattern": "GND"
+      },
+      {
+        "netclass": "MOSI",
+        "pattern": "/MOSI"
+      },
+      {
+        "netclass": "MISO",
+        "pattern": "/MISO"
+      },
+      {
+        "netclass": "SCLK",
+        "pattern": "/SCK"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 8"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 7"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 6"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 5"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 4"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 3"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 2"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 1"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 9"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 10"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 11"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 12"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 13"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 14"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 15"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 16"
+      }
+    ]
   },
   "pcbnew": {
     "last_paths": {
@@ -598,42 +741,12 @@
           "label": "Datasheet",
           "name": "Datasheet",
           "show": true
-        },
-        {
-          "group_by": false,
-          "label": "Sim.Pins",
-          "name": "Sim.Pins",
-          "show": false
-        },
-        {
-          "group_by": false,
-          "label": "Sim.Type",
-          "name": "Sim.Type",
-          "show": false
-        },
-        {
-          "group_by": false,
-          "label": "Sim.Device",
-          "name": "Sim.Device",
-          "show": false
-        },
-        {
-          "group_by": false,
-          "label": "Description",
-          "name": "Description",
-          "show": false
-        },
-        {
-          "group_by": false,
-          "label": "#",
-          "name": "${ITEM_NUMBER}",
-          "show": false
         }
       ],
       "filter_string": "",
       "group_symbols": true,
       "include_excluded_from_bom": true,
-      "name": "",
+      "name": "Default Editing",
       "sort_asc": true,
       "sort_field": "Reference"
     },
@@ -678,7 +791,7 @@
         "uuid": "177b52ef-cce2-4dab-a936-75649664352c"
       }
     ],
-    "used_designators": "C1-2",
+    "used_designators": "#PWR42,BT2,J3",
     "variants": []
   },
   "sheets": [
