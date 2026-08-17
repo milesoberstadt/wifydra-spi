@@ -660,6 +660,14 @@
       {
         "netclass": "CS",
         "pattern": "/CS 16"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 17"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 0"
       }
     ]
   },
@@ -791,7 +799,7 @@
         "uuid": "177b52ef-cce2-4dab-a936-75649664352c"
       }
     ],
-    "used_designators": "#PWR42,BT2,J3",
+    "used_designators": "C3",
     "variants": []
   },
   "sheets": [
