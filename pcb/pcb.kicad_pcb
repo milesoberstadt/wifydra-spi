@@ -3985,13 +3985,13 @@
 	(footprint "Package_DIP:DIP-14_W7.62mm_LongPads"
 		(layer "F.Cu")
 		(uuid "359e9756-a911-4c44-ada4-7cfc562d5a48")
-		(at 75 93 90)
+		(at 72.38 112.69 90)
 		(descr "14-lead though-hole mounted DIP package, row spacing 7.62mm (300 mils), LongPads")
 		(tags "THT DIP DIL PDIP 2.54mm 7.62mm 300mil LongPads")
 		(property "Reference" "U19"
 			(at 3.81 -2.33 90)
 			(layer "F.SilkS")
-			(uuid "0739a295-dab9-4263-b554-8224266f1a50")
+			(uuid "d14ead72-e52e-4324-b238-f40f7feb3ab3")
 			(effects
 				(font
 					(size 1 1)
@@ -4002,7 +4002,7 @@
 		(property "Value" "SN74HC125N"
 			(at 3.81 17.57 90)
 			(layer "F.Fab")
-			(uuid "5bcfacda-f192-44ab-b0e1-4829b95ee269")
+			(uuid "b7a1d378-bc55-4faa-bb06-9fe1cf8f67ac")
 			(effects
 				(font
 					(size 1 1)
@@ -4014,7 +4014,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "322bbfdb-7abe-49b4-8021-312f06b547b8")
+			(uuid "cadc737e-5345-4ea2-b530-2c026dfee1dd")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4025,7 +4025,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "ad9d3731-70ba-4b34-9a3d-0144fb0b612f")
+			(uuid "472fb144-a358-4fb1-a2b9-5bc0cb43150a")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4280,7 +4280,7 @@
 			)
 		)
 		(point
-			(at 82.62 89.19)
+			(at 80 108.88)
 			(size 1.27)
 			(layer "F.Fab")
 			(uuid "2f5e9819-b7bd-4eeb-9060-6de030eb5099")
@@ -6725,11 +6725,11 @@
 	(footprint "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm"
 		(layer "F.Cu")
 		(uuid "5f99ecda-4660-4f34-aa46-17486a3adb61")
-		(at 69 65.5 -90)
+		(at 73.75 97.38 180)
 		(descr "C, Disc series, Radial, pin pitch=2.50mm, diameter*width=5*2.5mm^2, Capacitor, http://cdn-reichelt.de/documents/datenblatt/B300/DS_KERKO_TC.pdf")
 		(tags "C Disc series Radial pin pitch 2.50mm diameter 5mm width 2.5mm Capacitor")
 		(property "Reference" "C2"
-			(at 1.25 -2.5 90)
+			(at 1.25 -2.5 0)
 			(layer "F.SilkS")
 			(uuid "23a15d6f-af7c-4e63-bab7-7e341f235c12")
 			(effects
@@ -6740,7 +6740,7 @@
 			)
 		)
 		(property "Value" "10uF"
-			(at 1.25 2.5 90)
+			(at 1.25 2.5 0)
 			(layer "F.Fab")
 			(uuid "311ad164-d6f3-479c-816f-56596f7e1c19")
 			(effects
@@ -6751,7 +6751,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 90)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "1f4d384c-c64f-456e-b4b5-042a8132d970")
@@ -6762,7 +6762,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 0 0 90)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "3dabe32b-a538-4a57-8394-c106ea9d88eb")
@@ -6773,7 +6773,7 @@
 			)
 		)
 		(property "KiLib_Generator" "capacitor/THT/other"
-			(at 0 0 90)
+			(at 0 0 0)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "1735c016-554c-4ff4-bdeb-48a01536acb5")
@@ -6797,16 +6797,6 @@
 		(attr through_hole)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -1.37 1.37)
-			(end -1.37 -1.37)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "2faeeead-b2a7-4ed6-b617-f909271f3d10")
-		)
-		(fp_line
 			(start 3.87 1.37)
 			(end -1.37 1.37)
 			(stroke
@@ -6817,16 +6807,6 @@
 			(uuid "9c8c8f7e-d848-4de5-a369-d07351aac454")
 		)
 		(fp_line
-			(start -1.37 -1.37)
-			(end 3.87 -1.37)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "f65aa490-9c21-41b7-8300-0044e105d923")
-		)
-		(fp_line
 			(start 3.87 -1.37)
 			(end 3.87 1.37)
 			(stroke
@@ -6835,6 +6815,26 @@
 			)
 			(layer "F.SilkS")
 			(uuid "1f88a2f4-4027-4854-b36b-4b8a099af228")
+		)
+		(fp_line
+			(start -1.37 1.37)
+			(end -1.37 -1.37)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "2faeeead-b2a7-4ed6-b617-f909271f3d10")
+		)
+		(fp_line
+			(start -1.37 -1.37)
+			(end 3.87 -1.37)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "f65aa490-9c21-41b7-8300-0044e105d923")
 		)
 		(fp_rect
 			(start -1.5 -1.5)
@@ -6859,7 +6859,7 @@
 			(uuid "1e755087-2ed3-44a7-86dd-877ab55d69e8")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 1.25 0 90)
+			(at 1.25 0 0)
 			(layer "F.Fab")
 			(uuid "9de3e0ed-bda2-413e-9a9f-3c048aad6051")
 			(effects
@@ -6870,7 +6870,7 @@
 			)
 		)
 		(pad "1" thru_hole circle
-			(at 0 0 270)
+			(at 0 0 180)
 			(size 1.6 1.6)
 			(drill 0.8)
 			(layers "*.Cu" "*.Mask")
@@ -6880,7 +6880,7 @@
 			(uuid "38700f02-e4a0-4e66-b181-d1ae88d6c8ae")
 		)
 		(pad "2" thru_hole circle
-			(at 2.5 0 270)
+			(at 2.5 0 180)
 			(size 1.6 1.6)
 			(drill 0.8)
 			(layers "*.Cu" "*.Mask")
@@ -9985,7 +9985,7 @@
 	(footprint "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm"
 		(layer "F.Cu")
 		(uuid "958d82d3-3e5e-46b6-92c6-78cce0a9137b")
-		(at 64.25 65.5 -90)
+		(at 68.5 82.38 -90)
 		(descr "C, Disc series, Radial, pin pitch=2.50mm, diameter*width=5*2.5mm^2, Capacitor, http://cdn-reichelt.de/documents/datenblatt/B300/DS_KERKO_TC.pdf")
 		(tags "C Disc series Radial pin pitch 2.50mm diameter 5mm width 2.5mm Capacitor")
 		(property "Reference" "C1"
@@ -10525,11 +10525,11 @@
 	(footprint "Package_TO_SOT_THT:TO-220-3_Vertical"
 		(layer "F.Cu")
 		(uuid "a874497d-bef0-4ce7-ab27-e09632dfe5ff")
-		(at 71.5 73.5 180)
+		(at 73.5 90 180)
 		(descr "TO-220-3, Vertical, RM 2.54mm, see https://www.vishay.com/docs/66542/to-220-1.pdf")
 		(tags "TO-220-3 Vertical RM 2.54mm")
 		(property "Reference" "U18"
-			(at 12.15 7.96 90)
+			(at 9 -1 90)
 			(layer "F.SilkS")
 			(uuid "e2103ba1-a259-4811-92ae-d39f05005c6a")
 			(effects
@@ -10778,13 +10778,13 @@
 	(footprint "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
 		(layer "F.Cu")
 		(uuid "ab223a7e-e075-468d-ae32-a732f48a8397")
-		(at 65.42 94)
+		(at 63 122.5)
 		(descr "Resistor, Axial_DIN0204 series, Axial, Horizontal, pin pitch=5.08mm, 0.167W, length*diameter=3.6*1.6mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0204 series Axial Horizontal pin pitch 5.08mm 0.167W length 3.6mm diameter 1.6mm")
 		(property "Reference" "R1"
 			(at 2.54 -1.92 0)
 			(layer "F.SilkS")
-			(uuid "9332f0ae-4978-49cf-a0ed-fd7ca823753d")
+			(uuid "bf1a4d0f-1ca3-44e0-80b8-7cbf9b33025a")
 			(effects
 				(font
 					(size 1 1)
@@ -10795,7 +10795,7 @@
 		(property "Value" "10k"
 			(at 2.54 1.92 0)
 			(layer "F.Fab")
-			(uuid "2b39b6d9-e3df-49a0-8682-2d18f510cdfc")
+			(uuid "1dbaca9d-20eb-4b79-903e-6868b5b9c847")
 			(effects
 				(font
 					(size 1 1)
@@ -10807,7 +10807,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "9ea5fef5-776d-4b48-ac0f-be886b6e2b85")
+			(uuid "688b66ca-fe7a-4ac5-a722-964580b89e8b")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10818,7 +10818,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "e052d686-70c3-4c59-b9aa-748cfe88ea23")
+			(uuid "5bf3156b-2474-451e-aea4-175720b90a03")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10971,7 +10971,7 @@
 			)
 		)
 		(property "Value" "SN74HC138N"
-			(at 11.275 10.835 90)
+			(at 0.5 11.96 90)
 			(layer "F.Fab")
 			(uuid "ea59a8b4-0023-4ed4-868b-ae4835505c10")
 			(effects
@@ -14287,7 +14287,7 @@
 	(footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical"
 		(layer "F.Cu")
 		(uuid "c98f7438-8b01-4dab-8c6f-b27f0a6fec95")
-		(at 59.5 81.5)
+		(at 58.5 102.88)
 		(descr "Through hole straight pin header, 1x06, 2.54mm pitch, single row")
 		(tags "Through hole pin header THT 1x06 2.54mm single row")
 		(property "Reference" "J2"
@@ -14572,7 +14572,7 @@
 	(footprint "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm"
 		(layer "F.Cu")
 		(uuid "d52b50e8-4494-434b-96c0-4029e8c18434")
-		(at 88.5 98 180)
+		(at 92.5 119.38 180)
 		(descr "C, Disc series, Radial, pin pitch=2.50mm, diameter*width=5*2.5mm^2, Capacitor, http://cdn-reichelt.de/documents/datenblatt/B300/DS_KERKO_TC.pdf")
 		(tags "C Disc series Radial pin pitch 2.50mm diameter 5mm width 2.5mm Capacitor")
 		(property "Reference" "C3"
@@ -14945,7 +14945,7 @@
 			)
 		)
 		(property "Value" "SN74HC138N"
-			(at 11.275 10.835 90)
+			(at 0 12 90)
 			(layer "F.Fab")
 			(uuid "7d147429-5cdb-4028-b34b-a89201be38d7")
 			(effects
@@ -16022,7 +16022,7 @@
 	(footprint "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
 		(layer "F.Cu")
 		(uuid "e3b38690-e08e-4e7c-bc69-fb3f98bb29df")
-		(at 57.5 30)
+		(at 58 65.46)
 		(descr "Through hole straight pin header, 1x04, 2.54mm pitch, single row")
 		(tags "Through hole pin header THT 1x04 2.54mm single row")
 		(property "Reference" "J1"
