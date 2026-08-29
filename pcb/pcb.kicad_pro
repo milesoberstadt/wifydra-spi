@@ -668,6 +668,54 @@
       {
         "netclass": "CS",
         "pattern": "/CS 0"
+      },
+      {
+        "netclass": "5V",
+        "pattern": "/CS 01"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "CS"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 01"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 02"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 03"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 04"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 05"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 06"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 07"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 08"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 00"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 09"
       }
     ]
   },
@@ -799,7 +847,7 @@
         "uuid": "177b52ef-cce2-4dab-a936-75649664352c"
       }
     ],
-    "used_designators": "C3",
+    "used_designators": "",
     "variants": []
   },
   "sheets": [
