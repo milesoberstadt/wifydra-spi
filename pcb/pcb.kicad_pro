@@ -513,11 +513,20 @@
         "wire_width": 6
       },
       {
+        "line_style": 0,
+        "name": "3.3V",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 0,
+        "schematic_color": "rgb(249, 14, 255)",
+        "tuning_profile": "",
+        "wire_width": 6
+      },
+      {
         "bus_width": 12,
         "line_style": 0,
         "name": "5V",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 5,
+        "priority": 6,
         "schematic_color": "rgb(255, 12, 9)",
         "tuning_profile": "",
         "wire_width": 6
@@ -527,7 +536,7 @@
         "line_style": 0,
         "name": "CS",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 3,
+        "priority": 4,
         "schematic_color": "rgb(255, 206, 0)",
         "tuning_profile": "",
         "wire_width": 6
@@ -537,7 +546,7 @@
         "line_style": 0,
         "name": "Ground",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 4,
+        "priority": 5,
         "schematic_color": "rgb(0, 0, 0)",
         "tuning_profile": "",
         "wire_width": 6
@@ -547,16 +556,17 @@
         "line_style": 0,
         "name": "MISO",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 1,
+        "priority": 2,
         "schematic_color": "rgb(145, 0, 255)",
-        "tuning_profile": ""
+        "tuning_profile": "",
+        "wire_width": 6
       },
       {
         "bus_width": 12,
         "line_style": 0,
         "name": "MOSI",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 2,
+        "priority": 3,
         "schematic_color": "rgb(9, 2, 255)",
         "tuning_profile": "",
         "wire_width": 6
@@ -566,9 +576,10 @@
         "line_style": 0,
         "name": "SCLK",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 0,
+        "priority": 1,
         "schematic_color": "rgb(50, 255, 42)",
-        "tuning_profile": ""
+        "tuning_profile": "",
+        "wire_width": 6
       }
     ],
     "meta": {
@@ -716,6 +727,10 @@
       {
         "netclass": "CS",
         "pattern": "/CS 09"
+      },
+      {
+        "netclass": "3.3V",
+        "pattern": "+3.3V"
       }
     ]
   },
@@ -925,7 +940,7 @@
         "uuid": "177b52ef-cce2-4dab-a936-75649664352c"
       }
     ],
-    "used_designators": "",
+    "used_designators": "#PWR47-49",
     "variants": []
   },
   "sheets": [
