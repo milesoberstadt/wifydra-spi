@@ -513,6 +513,7 @@
         "wire_width": 6
       },
       {
+        "bus_width": 12,
         "line_style": 0,
         "name": "3.3V",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
@@ -522,14 +523,15 @@
         "wire_width": 6
       },
       {
-        "bus_width": 12,
+        "bus_width": 16,
         "line_style": 0,
         "name": "5V",
-        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "pcb_color": "rgb(255, 230, 0)",
         "priority": 6,
         "schematic_color": "rgb(255, 12, 9)",
+        "track_width": 0.3,
         "tuning_profile": "",
-        "wire_width": 6
+        "wire_width": 12
       },
       {
         "bus_width": 12,
@@ -589,24 +591,84 @@
     "netclass_assignments": null,
     "netclass_patterns": [
       {
+        "netclass": "3.3V",
+        "pattern": "+3.3V"
+      },
+      {
         "netclass": "5V",
         "pattern": "+5V"
       },
       {
-        "netclass": "Ground",
-        "pattern": "GND"
+        "netclass": "5V",
+        "pattern": "/CS 01"
       },
       {
-        "netclass": "MOSI",
-        "pattern": "/MOSI"
+        "netclass": "CS",
+        "pattern": "/CS 00"
       },
       {
-        "netclass": "MISO",
-        "pattern": "/MISO"
+        "netclass": "CS",
+        "pattern": "/CS 08"
       },
       {
-        "netclass": "SCLK",
-        "pattern": "/SCK"
+        "netclass": "CS",
+        "pattern": "/CS 07"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 06"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 05"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 04"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 03"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 02"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 01"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "CS"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 09"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 0"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 17"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 16"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 15"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 14"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS 12"
       },
       {
         "netclass": "CS",
@@ -654,83 +716,23 @@
       },
       {
         "netclass": "CS",
-        "pattern": "/CS 12"
-      },
-      {
-        "netclass": "CS",
         "pattern": "/CS 13"
       },
       {
-        "netclass": "CS",
-        "pattern": "/CS 14"
+        "netclass": "Ground",
+        "pattern": "GND"
       },
       {
-        "netclass": "CS",
-        "pattern": "/CS 15"
+        "netclass": "MISO",
+        "pattern": "/MISO"
       },
       {
-        "netclass": "CS",
-        "pattern": "/CS 16"
+        "netclass": "MOSI",
+        "pattern": "/MOSI"
       },
       {
-        "netclass": "CS",
-        "pattern": "/CS 17"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "/CS 0"
-      },
-      {
-        "netclass": "5V",
-        "pattern": "/CS 01"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "CS"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "/CS 01"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "/CS 02"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "/CS 03"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "/CS 04"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "/CS 05"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "/CS 06"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "/CS 07"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "/CS 08"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "/CS 00"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "/CS 09"
-      },
-      {
-        "netclass": "3.3V",
-        "pattern": "+3.3V"
+        "netclass": "SCLK",
+        "pattern": "/SCK"
       }
     ]
   },
