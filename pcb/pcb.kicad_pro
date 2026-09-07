@@ -69,7 +69,13 @@
           "thermal_relief_spoke_width": 0.5
         }
       },
-      "diff_pair_dimensions": [],
+      "diff_pair_dimensions": [
+        {
+          "gap": 0.0,
+          "via_gap": 0.0,
+          "width": 0.0
+        }
+      ],
       "drc_exclusions": [],
       "meta": {
         "version": 2
@@ -203,7 +209,10 @@
           "td_width_to_size_filter_ratio": 0.9
         }
       ],
-      "track_widths": [],
+      "track_widths": [
+        0.0,
+        0.3
+      ],
       "tuning_pattern_settings": {
         "diff_pair_defaults": {
           "corner_radius_percentage": 80,
@@ -230,7 +239,12 @@
           "spacing": 0.6
         }
       },
-      "via_dimensions": [],
+      "via_dimensions": [
+        {
+          "diameter": 0.0,
+          "drill": 0.0
+        }
+      ],
       "zones_allow_external_fillets": false
     },
     "ipc2581": {
@@ -514,30 +528,37 @@
       },
       {
         "bus_width": 12,
+        "clearance": 0.25,
         "line_style": 0,
         "name": "3.3V",
-        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "pcb_color": "rgb(249, 14, 255)",
         "priority": 0,
         "schematic_color": "rgb(249, 14, 255)",
+        "track_width": 0.6,
         "tuning_profile": "",
+        "via_diameter": 0.7,
+        "via_drill": 0.35,
         "wire_width": 6
       },
       {
         "bus_width": 16,
+        "clearance": 0.25,
         "line_style": 0,
         "name": "5V",
-        "pcb_color": "rgb(255, 230, 0)",
+        "pcb_color": "rgb(255, 12, 9)",
         "priority": 6,
         "schematic_color": "rgb(255, 12, 9)",
-        "track_width": 0.3,
+        "track_width": 2.5,
         "tuning_profile": "",
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
         "wire_width": 12
       },
       {
         "bus_width": 12,
         "line_style": 0,
         "name": "CS",
-        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "pcb_color": "rgb(255, 206, 0)",
         "priority": 4,
         "schematic_color": "rgb(255, 206, 0)",
         "tuning_profile": "",
@@ -545,19 +566,23 @@
       },
       {
         "bus_width": 12,
+        "clearance": 0.2,
         "line_style": 0,
         "name": "Ground",
-        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "pcb_color": "rgb(0, 0, 0)",
         "priority": 5,
         "schematic_color": "rgb(0, 0, 0)",
+        "track_width": 2.5,
         "tuning_profile": "",
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
         "wire_width": 6
       },
       {
         "bus_width": 12,
         "line_style": 0,
         "name": "MISO",
-        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "pcb_color": "rgb(145, 0, 255)",
         "priority": 2,
         "schematic_color": "rgb(145, 0, 255)",
         "tuning_profile": "",
@@ -567,7 +592,7 @@
         "bus_width": 12,
         "line_style": 0,
         "name": "MOSI",
-        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "pcb_color": "rgb(9, 2, 255)",
         "priority": 3,
         "schematic_color": "rgb(9, 2, 255)",
         "tuning_profile": "",
@@ -577,7 +602,7 @@
         "bus_width": 12,
         "line_style": 0,
         "name": "SCLK",
-        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "pcb_color": "rgb(50, 255, 42)",
         "priority": 1,
         "schematic_color": "rgb(50, 255, 42)",
         "tuning_profile": "",
@@ -587,7 +612,9 @@
     "meta": {
       "version": 5
     },
-    "net_colors": null,
+    "net_colors": {
+      "+5V": "rgb(251, 255, 0)"
+    },
     "netclass_assignments": null,
     "netclass_patterns": [
       {
@@ -599,7 +626,7 @@
         "pattern": "+5V"
       },
       {
-        "netclass": "5V",
+        "netclass": "CS",
         "pattern": "/CS 01"
       },
       {
@@ -633,10 +660,6 @@
       {
         "netclass": "CS",
         "pattern": "/CS 02"
-      },
-      {
-        "netclass": "CS",
-        "pattern": "/CS 01"
       },
       {
         "netclass": "CS",
@@ -733,6 +756,10 @@
       {
         "netclass": "SCLK",
         "pattern": "/SCK"
+      },
+      {
+        "netclass": "CS",
+        "pattern": "/CS Addr 1"
       }
     ]
   },
@@ -942,7 +969,7 @@
         "uuid": "177b52ef-cce2-4dab-a936-75649664352c"
       }
     ],
-    "used_designators": "C4",
+    "used_designators": "H1-4,C4",
     "variants": []
   },
   "sheets": [
